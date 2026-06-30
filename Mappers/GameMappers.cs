@@ -9,7 +9,7 @@ namespace GameLibraryAPI.Mappers
 {
     public static class GameMappers
     {
-        public static GameDto ToGameDto(Game game)
+        public static GameDto ToGameDto(this Game game)
         {
             return new GameDto
             {
