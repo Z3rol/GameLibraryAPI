@@ -484,3 +484,6 @@ $RECYCLE.BIN/
 #
 *.http
 *.https
+
+# 
+*.db
