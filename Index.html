@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Library Frontend</title>
+    <style>
+        body { font-family: system-ui, sans-serif; background-color: #121212; color: white; padding: 20px; }
+        .game-card { background-color: #1e1e1e; border: 1px solid #333; padding: 15px; margin-bottom: 10px; border-radius: 8px; }
+        h3 { margin-top: 0; color: #4db8ff; }
+        button { padding: 10px 20px; background-color: #4db8ff; color: #000; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #3aa1e6; }
+    </style>
+</head>
+<body>
+
+    <h1>🎮 My Game Backlog</h1>
+    <button onclick="fetchGames()">Load Games from API</button>
+    
+    <div id="game-list" style="margin-top: 20px;"></div>
+
+    <script>
+        // ⚠️ Change this to whatever port your Swagger opens on!
+        const apiUrl = 'http://localhost:5237/api/game';
+
+        async function fetchGames() {
+            const container = document.getElementById('game-list');
+            container.innerHTML = "<p>Loading...</p>";
+
+            try {
+                // 1. Call the C# API
+                const response = await fetch(apiUrl);
+                
+                // 2. Convert the response into a JSON array
+                const games = await response.json();
+                
+                container.innerHTML = ""; // Clear the loading text
+
+                if (games.length === 0) {
+                    container.innerHTML = "<p>No games in the database yet!</p>";
+                    return;
+                }
+
+                // 3. Loop through the array and build pure HTML for each game
+                games.forEach(game => {
+                    const gameDiv = document.createElement('div');
+                    gameDiv.className = 'game-card';
+                    
+                    // Notice how we use the properties from your GameDto!
+                    gameDiv.innerHTML = `
+                        <h3>${game.name}</h3>
+                        <p><strong>Genre:</strong> ${game.genre}</p>
+                        <p><strong>Developer:</strong> ${game.developerName}</p>
+                        <p><strong>Price:</strong> $${game.price}</p>
+                        <p><strong>Released:</strong> ${game.releasedOn}</p>
+                    `;
+                    
+                    // Add the new HTML to the screen
+                    container.appendChild(gameDiv);
+                });
+
+            } catch (error) {
+                container.innerHTML = `<p style="color:red;">Error fetching games! Is your C# API running?</p>`;
+                console.error(error);
+            }
+        }
+    </script>
+
+</body>
+</html>
