@@ -26,5 +26,20 @@ namespace GameLibraryAPI.Controllers
 
             return Ok(gamesDto);
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById([FromRoute] int id)
+        {
+            var game = await _gameRepo.GetByIdAsync(id);
+
+            if (game == null)
+            {
+                return NotFound("Game not found");
+            }
+
+            var gameDto = game.ToGameDto();
+
+            return Ok(gameDto);
+        }
     }
 }

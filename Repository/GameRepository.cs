@@ -21,5 +21,10 @@ namespace GameLibraryAPI.Repository
         {
             return await _context.Games.ToListAsync();
         }
+
+        public async Task<Game?> GetByIdAsync(int id)
+        {
+            return await _context.Games.FindAsync(id);
+        }
     }
 }
