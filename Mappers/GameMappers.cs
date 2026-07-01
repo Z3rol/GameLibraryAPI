@@ -21,5 +21,17 @@ namespace GameLibraryAPI.Mappers
                 ReleasedOn = game.ReleasedOn
             };
         }
+
+        public static Game ToGameFromCreate(this CreateGameRequestDto gameDto)
+        {
+            return new Game
+            {
+                Name = gameDto.Name,
+                Genre = gameDto.Genre,
+                DeveloperName = gameDto.DeveloperName,
+                Price = gameDto.Price,
+                ReleasedOn = gameDto.ReleasedOn
+            };
+        }
     }
 }
