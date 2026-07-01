@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GameLibraryAPI.Mappers;
 using GameLibraryAPI.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using GameLibraryAPI.DTOs.Game;
 
 namespace GameLibraryAPI.Controllers
 {
@@ -40,6 +41,14 @@ namespace GameLibraryAPI.Controllers
             var gameDto = game.ToGameDto();
 
             return Ok(gameDto);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateGameRequestDto gameDto)
+        {
+            var gameModel = gameDto.ToGameFromCreate();
+            await _gameRepo.CreateAsync(gameModel);
+            return CreatedAtAction(nameof (GetById), new {id = gameModel.Id}, gameModel.ToGameDto());
         }
     }
 }

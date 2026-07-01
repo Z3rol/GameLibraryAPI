@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GameLibraryAPI.Data;
+using GameLibraryAPI.DTOs.Game;
 using GameLibraryAPI.Interfaces;
+using GameLibraryAPI.Mappers;
 using GameLibraryAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +27,13 @@ namespace GameLibraryAPI.Repository
         public async Task<Game?> GetByIdAsync(int id)
         {
             return await _context.Games.FindAsync(id);
+        }
+
+        public async Task<Game> CreateAsync(Game gameModel)
+        {
+            await _context.Games.AddAsync(gameModel);
+            await _context.SaveChangesAsync();
+            return gameModel;
         }
     }
 }
