@@ -35,5 +35,19 @@ namespace GameLibraryAPI.Repository
             await _context.SaveChangesAsync();
             return gameModel;
         }
+
+        public async Task<Game?> DeleteAsync(int id)
+        {
+            var game = await _context.Games.FindAsync(id);
+
+            if (game == null)
+            {
+                return null;
+            }
+
+            _context.Remove(game);
+            await _context.SaveChangesAsync();
+            return game;
+        }
     }
 }

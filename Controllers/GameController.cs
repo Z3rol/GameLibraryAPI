@@ -50,5 +50,18 @@ namespace GameLibraryAPI.Controllers
             await _gameRepo.CreateAsync(gameModel);
             return CreatedAtAction(nameof (GetById), new {id = gameModel.Id}, gameModel.ToGameDto());
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            var game = await _gameRepo.DeleteAsync(id);
+
+            if (game == null)
+            {
+                return NotFound("Game not found");
+            }
+
+            return NoContent();
+        }
     }
 }
