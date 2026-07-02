@@ -51,6 +51,19 @@ namespace GameLibraryAPI.Controllers
             return CreatedAtAction(nameof (GetById), new {id = gameModel.Id}, gameModel.ToGameDto());
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdatePrice([FromRoute] int id, [FromBody] UpdateGamePriceDto newPrice)
+        {
+            var game = await _gameRepo.UpdatePriceAsync(id, newPrice.Price);
+
+            if (game == null)
+            {
+                return NotFound("Game not found");
+            }
+
+            return Ok(game);
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {

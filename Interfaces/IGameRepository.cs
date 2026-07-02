@@ -13,6 +13,7 @@ namespace GameLibraryAPI.Interfaces
         public Task<List<Game>> GetAllAsync();
         public Task<Game?> GetByIdAsync(int id);
         public Task<Game> CreateAsync(Game gameModel);
+        public Task<Game?> UpdatePriceAsync(int id, double newPrice);
         public Task<Game?> DeleteAsync(int id);
     }
 }

@@ -6,15 +6,10 @@ using System.Threading.Tasks;
 
 namespace GameLibraryAPI.DTOs.Game
 {
-    public class GameDto
+    public class UpdateGamePriceDto
     {
-        public int Id { get; set; }
-        public string Name { get; set; } = "";
-        public string Genre { get; set; } = "";
-        public string DeveloperName { get; set; } = "";
         [Required]
         [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
         public double Price { get; set; }
-        public DateOnly ReleasedOn { get; set; }
     }
 }
