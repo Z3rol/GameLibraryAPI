@@ -52,6 +52,7 @@ namespace GameLibraryAPI.Controllers
         }
 
         [HttpPut("{id}")]
+        [HttpPatch("{id}/price")]
         public async Task<IActionResult> UpdatePrice([FromRoute] int id, [FromBody] UpdateGamePriceDto newPrice)
         {
             var game = await _gameRepo.UpdatePriceAsync(id, newPrice.Price);
@@ -61,7 +62,7 @@ namespace GameLibraryAPI.Controllers
                 return NotFound("Game not found");
             }
 
-            return Ok(game);
+            return Ok(game.ToGameDto());
         }
 
         [HttpDelete("{id}")]
