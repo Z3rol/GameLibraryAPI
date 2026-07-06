@@ -46,22 +46,33 @@ namespace GameLibraryAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateGameRequestDto gameDto)
         {
+            // Prevent duplicates
+            var nameIsTaken = await _gameRepo.GameExistsAsync(gameDto.Name);
+            if (nameIsTaken)
+            {
+                return BadRequest("Name is already taken");
+            }
+
             var gameModel = gameDto.ToGameFromCreate();
             await _gameRepo.CreateAsync(gameModel);
             return CreatedAtAction(nameof (GetById), new {id = gameModel.Id}, gameModel.ToGameDto());
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateDetails([FromRoute] int id, [FromBody] UpdateGameDetailsDto newDatails)
+        public async Task<IActionResult> UpdateDetails([FromRoute] int id, [FromBody] UpdateGameDetailsDto updateDto)
         {
-            var game = await _gameRepo.UpdateDatailsAsync(id, newDatails);
+            try
+            {    
+                var game = await _gameRepo.UpdateDatailsAsync(id, updateDto);
+                if (game == null)
+                    return NotFound("Game not found");
 
-            if (game == null)
-            {
-                return NotFound("Game not found");
+                return Ok(game.ToGameDto());
             }
-
-            return Ok(game.ToGameDto());
+            catch (InvalidOperationException ex) when (ex.Message == "NameIsTaken")
+            {
+                return BadRequest("Name is already taken");
+            }
         }
 
         [HttpPatch("{id}/price")]

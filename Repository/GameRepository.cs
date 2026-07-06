@@ -39,10 +39,13 @@ namespace GameLibraryAPI.Repository
         public async Task<Game?> UpdateDatailsAsync(int id, UpdateGameDetailsDto updateDto)
         {
             var game = await _context.Games.FindAsync(id);
+            if (game == null) return null;
 
-            if (game == null)
+            if (updateDto.Name != game.Name)
             {
-                return null;
+                var nameIsTaken = await _context.Games.AnyAsync(g => g.Name == updateDto.Name);
+                if (nameIsTaken)
+                    throw new InvalidOperationException("NameIsTaken");
             }
 
             game.Name = updateDto.Name;
@@ -81,6 +84,11 @@ namespace GameLibraryAPI.Repository
             _context.Remove(game);
             await _context.SaveChangesAsync();
             return game;
+        }
+
+        public async Task<bool> GameExistsAsync(string name)
+        {
+            return await _context.Games.AnyAsync(g => g.Name.ToLower() == name.ToLower());
         }
     }
 }
