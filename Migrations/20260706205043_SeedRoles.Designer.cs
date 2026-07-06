@@ -3,6 +3,7 @@ using System;
 using GameLibraryAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GameLibraryAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260706205043_SeedRoles")]
+    partial class SeedRoles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.9");
@@ -138,15 +141,15 @@ namespace GameLibraryAPI.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "AdminRole_Id_1",
-                            ConcurrencyStamp = "AdminRole_Stamp_1",
+                            Id = "b8b67401-5ff9-4bd8-9242-dfed31756ef5",
+                            ConcurrencyStamp = "90501afe-ff58-42f5-b53d-6d6874c09d63",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "UserRole_Id_2",
-                            ConcurrencyStamp = "UserRole_Stamp_2",
+                            Id = "c14c7310-8692-4c33-85fb-3a9f778eefb0",
+                            ConcurrencyStamp = "058773e7-8958-42a0-80de-22206f592b1d",
                             Name = "User",
                             NormalizedName = "USER"
                         });
