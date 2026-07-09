@@ -1,9 +1,13 @@
+using System.Text;
 using GameLibraryAPI.Data;
 using GameLibraryAPI.Interfaces;
 using GameLibraryAPI.Models;
 using GameLibraryAPI.Repository;
+using GameLibraryAPI.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +17,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder.Services.AddScoped<IGameRepository, GameRepository>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
@@ -28,6 +33,30 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
     options.Password.RequiredLength = 8;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultForbidScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["JWT:Issuer"],
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["JWT:Audience"],
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"]!)
+        )
+    };
+});
 
 builder.Services.AddCors(options =>
 {

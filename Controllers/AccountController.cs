@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GameLibraryAPI.DTOs.Account;
 using GameLibraryAPI.Models;
+using GameLibraryAPI.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,11 +16,13 @@ namespace GameLibraryAPI.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly ITokenService _tokenService;
 
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ITokenService tokenService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _tokenService = tokenService;
         }
 
         [HttpPost("register")]
@@ -82,7 +85,14 @@ namespace GameLibraryAPI.Controllers
                 return Unauthorized("Invalid username or password");
             }
 
-            return Ok("Successfully logged in");
+            var token = _tokenService.CreateToken(user);
+
+            return Ok(new
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+                Token = token
+            });
         }
     }
 }
