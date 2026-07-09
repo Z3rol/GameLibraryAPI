@@ -14,10 +14,12 @@ namespace GameLibraryAPI.Controllers
     public class AccountController : ControllerBase
     {
         private readonly UserManager<AppUser> _userManager;
+        private readonly SignInManager<AppUser> _signInManager;
 
-        public AccountController(UserManager<AppUser> userManager)
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
         {
             _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         [HttpPost("register")]
@@ -57,6 +59,30 @@ namespace GameLibraryAPI.Controllers
             {
                 return StatusCode(500, e.Message);
             }
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginDto loginDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var user = await _userManager.FindByNameAsync(loginDto.UserNameOrEmail) ??
+                await _userManager.FindByEmailAsync(loginDto.UserNameOrEmail);
+
+            if (user == null)
+            {
+                return Unauthorized("Invalid username or password");
+            }
+
+            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
+
+            if (!result.Succeeded)
+            {
+                return Unauthorized("Invalid username or password");
+            }
+
+            return Ok("Successfully logged in");
         }
     }
 }
