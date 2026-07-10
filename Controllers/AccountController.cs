@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GameLibraryAPI.DTOs.Account;
 using GameLibraryAPI.Models;
 using GameLibraryAPI.Repository;
+using GameLibraryAPI.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -85,7 +86,9 @@ namespace GameLibraryAPI.Controllers
                 return Unauthorized("Invalid username or password");
             }
 
-            var token = _tokenService.CreateToken(user);
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var token = _tokenService.CreateToken(user, roles);
 
             return Ok(new
             {

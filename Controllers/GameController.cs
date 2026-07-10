@@ -6,6 +6,7 @@ using GameLibraryAPI.Mappers;
 using GameLibraryAPI.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using GameLibraryAPI.DTOs.Game;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GameLibraryAPI.Controllers
 {
@@ -44,6 +45,7 @@ namespace GameLibraryAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] CreateGameRequestDto gameDto)
         {
             // Prevent duplicates
@@ -59,6 +61,7 @@ namespace GameLibraryAPI.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateDetails([FromRoute] int id, [FromBody] UpdateGameDetailsDto updateDto)
         {
             try
@@ -76,9 +79,10 @@ namespace GameLibraryAPI.Controllers
         }
 
         [HttpPatch("{id}/price")]
-        public async Task<IActionResult> UpdatePrice([FromRoute] int id, [FromBody] UpdateGamePriceDto newPrice)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdatePrice([FromRoute] int id, [FromBody] UpdateGamePriceDto updateDto)
         {
-            var game = await _gameRepo.UpdatePriceAsync(id, newPrice.Price);
+            var game = await _gameRepo.UpdatePriceAsync(id, updateDto.Price);
 
             if (game == null)
             {
@@ -89,6 +93,7 @@ namespace GameLibraryAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             var game = await _gameRepo.DeleteAsync(id);
