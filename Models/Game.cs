@@ -13,5 +13,6 @@ namespace GameLibraryAPI.Models
         public string DeveloperName { get; set; } = "";
         public double Price { get; set; }
         public DateOnly ReleasedOn { get; set; }
+        public List<UserGame> UserGames { get; set; } = [];
     }
 }

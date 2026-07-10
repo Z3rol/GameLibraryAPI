@@ -11,12 +11,11 @@ namespace GameLibraryAPI.Data
 {
     public class ApplicationDbContext : IdentityDbContext<AppUser>
     {
-        public ApplicationDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
-        {
-            
-        }
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbContextOptions)
+            : base(dbContextOptions) { }
 
         public DbSet<Game> Games { get; set; }
+        public DbSet<UserGame> UserGames { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -41,6 +40,20 @@ namespace GameLibraryAPI.Data
             };
 
             builder.Entity<IdentityRole>().HasData(roles);
+
+
+            builder.Entity<UserGame>()
+                .HasKey(ug => new { ug.AppUserId, ug.GameId });
+
+            builder.Entity<UserGame>()
+                .HasOne(ug => ug.AppUser)
+                .WithMany(ug => ug.UserGames)
+                .HasForeignKey(ug => ug.AppUserId);
+
+            builder.Entity<UserGame>()
+                .HasOne(ug => ug.Game)
+                .WithMany(ug => ug.UserGames)
+                .HasForeignKey(ug => ug.GameId);
         }
     }
 }
