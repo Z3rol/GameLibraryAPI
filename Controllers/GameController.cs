@@ -42,6 +42,8 @@ namespace GameLibraryAPI.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] CreateGameRequestDto gameDto)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var nameIsTaken = await _gameRepo.GameExistsAsync(gameDto.Name);
             if (nameIsTaken) return BadRequest("Name is already taken;");
 
@@ -55,6 +57,8 @@ namespace GameLibraryAPI.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateDetails([FromRoute] int id, [FromBody] UpdateGameDetailsDto updateDto)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var existingGame = await _gameRepo.GetByIdAsync(id);
             if (existingGame == null) return NotFound("Game not found.");
             
@@ -75,6 +79,8 @@ namespace GameLibraryAPI.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdatePrice([FromRoute] int id, [FromBody] UpdateGamePriceDto updateDto)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            
             var game = await _gameRepo.UpdatePriceAsync(id, updateDto.Price);
             if (game == null) return NotFound("Game not found.");
 
