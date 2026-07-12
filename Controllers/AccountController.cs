@@ -47,7 +47,7 @@ namespace GameLibraryAPI.Controllers
 
                     if (roleResult.Succeeded)
                     {
-                        return Ok("User registered succsessfully");
+                        return Ok("User registered successfully");
                     }
                     else
                     {
@@ -66,7 +66,7 @@ namespace GameLibraryAPI.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginDto loginDto)
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
