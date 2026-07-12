@@ -6,7 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using GameLibraryAPI.Models;
-using GameLibraryAPI.Repository;
+using GameLibraryAPI.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 
 namespace GameLibraryAPI.Services

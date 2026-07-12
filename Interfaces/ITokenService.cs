@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GameLibraryAPI.Models;
 
-namespace GameLibraryAPI.Repository
+namespace GameLibraryAPI.Interfaces
 {
     public interface ITokenService
     {
