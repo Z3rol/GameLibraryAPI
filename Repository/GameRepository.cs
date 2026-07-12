@@ -41,13 +41,6 @@ namespace GameLibraryAPI.Repository
             var game = await _context.Games.FindAsync(id);
             if (game == null) return null;
 
-            if (updateDto.Name != game.Name)
-            {
-                var nameIsTaken = await _context.Games.AnyAsync(g => g.Name == updateDto.Name);
-                if (nameIsTaken)
-                    throw new InvalidOperationException("NameIsTaken");
-            }
-
             game.Name = updateDto.Name;
             game.Genre = updateDto.Genre;
             game.DeveloperName = updateDto.DeveloperName;
@@ -60,11 +53,7 @@ namespace GameLibraryAPI.Repository
         public async Task<Game?> UpdatePriceAsync(int id, double newPrice)
         {
             var game = await _context.Games.FindAsync(id);
-
-            if (game == null)
-            {
-                return null;
-            }
+            if (game == null) return null;
 
             game.Price = newPrice;
             
@@ -75,11 +64,7 @@ namespace GameLibraryAPI.Repository
         public async Task<Game?> DeleteAsync(int id)
         {
             var game = await _context.Games.FindAsync(id);
-
-            if (game == null)
-            {
-                return null;
-            }
+            if (game == null) return null;
 
             _context.Remove(game);
             await _context.SaveChangesAsync();
