@@ -10,5 +10,6 @@ namespace GameLibraryAPI.Interfaces
     {
         public Task<List<Game>> GetUserLibraryAsync(string userId);
         public Task<bool> UserOwnsGameAsync(string userId, int gameId);
+        public Task<UserGame> AddGameToLibraryAsync(UserGame userGame);
     }
 }

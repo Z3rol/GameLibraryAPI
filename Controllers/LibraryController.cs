@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using GameLibraryAPI.Data;
 using GameLibraryAPI.Interfaces;
@@ -37,7 +39,36 @@ namespace GameLibraryAPI.Controllers
 
             var userGamesDto = userGames.Select(ug => ug.ToGameDto());
 
-            return Ok(userGames);
+            return Ok(userGamesDto);
+        }
+
+        [HttpPost("{gameId}")]
+        public async Task<IActionResult> AddGameToLibrary([FromRoute] int gameId)
+        {
+            var userName = User.Identity?.Name 
+                ?? User.FindFirstValue(ClaimTypes.Name) 
+                ?? User.FindFirstValue(ClaimTypes.GivenName) 
+                ?? User.FindFirstValue(JwtRegisteredClaimNames.UniqueName)
+                ?? User.FindFirstValue(JwtRegisteredClaimNames.GivenName);
+                
+            if (string.IsNullOrWhiteSpace(userName))
+                return Unauthorized("You must be logged in to add games to your library.");
+
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null) return NotFound("User not found.");
+
+            var userOwnsGame = await _libraryRepo.UserOwnsGameAsync(user.Id, gameId);
+            if (userOwnsGame) return BadRequest("You already own this game.");
+
+            var userGame = new UserGame
+            {
+                AppUserId = user.Id,
+                GameId = gameId
+            };
+            
+            await _libraryRepo.AddGameToLibraryAsync(userGame);
+
+            return Ok("Game successfully added to your library.");
         }
     }
 }

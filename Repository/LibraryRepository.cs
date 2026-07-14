@@ -30,5 +30,12 @@ namespace GameLibraryAPI.Repository
             return await _context.UserGames
                 .AnyAsync(ug => ug.AppUserId == userId && ug.GameId == gameId);
         }
+
+        public async Task<UserGame> AddGameToLibraryAsync(UserGame userGame)
+        {
+            await _context.UserGames.AddAsync(userGame);
+            await _context.SaveChangesAsync();
+            return userGame;
+        }
     }
 }
