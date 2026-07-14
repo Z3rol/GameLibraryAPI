@@ -9,5 +9,6 @@ namespace GameLibraryAPI.Interfaces
     public interface ILibraryRepository
     {
         public Task<List<Game>> GetUserLibraryAsync(string userId);
+        public Task<bool> UserOwnsGameAsync(string userId, int gameId);
     }
 }

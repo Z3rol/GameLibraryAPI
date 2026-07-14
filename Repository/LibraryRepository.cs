@@ -24,5 +24,11 @@ namespace GameLibraryAPI.Repository
                 .Select(ug => ug.Game)
                 .ToListAsync();
         }
+
+        public async Task<bool> UserOwnsGameAsync(string userId, int gameId)
+        {
+            return await _context.UserGames
+                .AnyAsync(ug => ug.AppUserId == userId && ug.GameId == gameId);
+        }
     }
 }
