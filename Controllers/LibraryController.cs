@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using GameLibraryAPI.Data;
+using GameLibraryAPI.Extensions;
 using GameLibraryAPI.Interfaces;
 using GameLibraryAPI.Mappers;
 using GameLibraryAPI.Models;
@@ -45,14 +46,7 @@ namespace GameLibraryAPI.Controllers
         [HttpPost("{gameId}")]
         public async Task<IActionResult> AddGameToLibrary([FromRoute] int gameId)
         {
-            var userName = User.Identity?.Name 
-                ?? User.FindFirstValue(ClaimTypes.Name) 
-                ?? User.FindFirstValue(ClaimTypes.GivenName) 
-                ?? User.FindFirstValue(JwtRegisteredClaimNames.UniqueName)
-                ?? User.FindFirstValue(JwtRegisteredClaimNames.GivenName);
-                
-            if (string.IsNullOrWhiteSpace(userName))
-                return Unauthorized("You must be logged in to add games to your library.");
+            var userName = User.GetUserName();
 
             var user = await _userManager.FindByNameAsync(userName);
             if (user == null) return NotFound("User not found.");
