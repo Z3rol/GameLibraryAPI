@@ -24,11 +24,12 @@ namespace GameLibraryAPI.Repository
         {
             var games = _context.Games.AsQueryable();
 
+            // Filtering
             if (!string.IsNullOrWhiteSpace(query.Name))
             {
                 games = games.Where(g => g.Name.ToLower().Contains(query.Name.ToLower()));
             }
-            
+
             if (!string.IsNullOrWhiteSpace(query.Genre))
             {
                 games = games.Where(g => g.Genre.ToLower() == query.Genre.ToLower());
@@ -37,6 +38,19 @@ namespace GameLibraryAPI.Repository
             if (!string.IsNullOrWhiteSpace(query.DeveloperName))
             {
                 games = games.Where(g => g.DeveloperName.ToLower() == query.DeveloperName.ToLower());
+            }
+
+            // Sorting
+            if (!string.IsNullOrWhiteSpace(query.SortBy))
+            {
+                if (query.SortBy.Equals("Price", StringComparison.OrdinalIgnoreCase))
+                {
+                    games = query.IsDescending ? games.OrderByDescending(g => g.Price) : games.OrderBy(g => g.Price);
+                }
+                else if (query.SortBy.Equals("ReleasedOn", StringComparison.OrdinalIgnoreCase))
+                {
+                    games = query.IsDescending ? games.OrderByDescending(g => g.ReleasedOn) : games.OrderBy(g => g.ReleasedOn);
+                }
             }
 
             return await games.ToListAsync();
