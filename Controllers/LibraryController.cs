@@ -64,5 +64,20 @@ namespace GameLibraryAPI.Controllers
 
             return Ok("Game successfully added to your library.");
         }
+
+        [HttpDelete("{gameId}")]
+        public async Task<IActionResult> RemoveGameFromLibrary([FromRoute] int gameId)
+        {
+            var username = User.GetUserName();
+
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null) return NotFound("User not found.");
+
+            var userOwnsGame = await _libraryRepo.UserOwnsGameAsync(user.Id, gameId);
+            if (!userOwnsGame) return BadRequest("This game is not in your library");
+
+            await _libraryRepo.RemoveGameFromLibraryAsync(user.Id, gameId);
+            return NoContent();
+        }
     }
 }
