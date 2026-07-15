@@ -7,11 +7,13 @@ using GameLibraryAPI.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using GameLibraryAPI.DTOs.Game;
 using Microsoft.AspNetCore.Authorization;
+using GameLibraryAPI.Helpers;
 
 namespace GameLibraryAPI.Controllers
 {
     [Route("api/game")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class GameController : ControllerBase
     {
         private readonly IGameRepository _gameRepo;
@@ -21,15 +23,17 @@ namespace GameLibraryAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] string? genre)
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAll([FromQuery] GameQueryObject query)
         {
-            var games = await _gameRepo.GetAllAsync(genre);
+            var games = await _gameRepo.GetAllAsync(query);
             var gamesDto = games.Select(g => g.ToGameDto());
 
             return Ok(gamesDto);
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
             var game = await _gameRepo.GetByIdAsync(id);
@@ -39,7 +43,6 @@ namespace GameLibraryAPI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] CreateGameRequestDto gameDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -54,7 +57,6 @@ namespace GameLibraryAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateDetails([FromRoute] int id, [FromBody] UpdateGameDetailsDto updateDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -76,7 +78,6 @@ namespace GameLibraryAPI.Controllers
         }
 
         [HttpPatch("{id}/price")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdatePrice([FromRoute] int id, [FromBody] UpdateGamePriceDto updateDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -88,7 +89,6 @@ namespace GameLibraryAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             var game = await _gameRepo.DeleteAsync(id);

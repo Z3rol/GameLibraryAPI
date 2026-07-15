@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GameLibraryAPI.Data;
 using GameLibraryAPI.DTOs.Game;
+using GameLibraryAPI.Helpers;
 using GameLibraryAPI.Interfaces;
 using GameLibraryAPI.Mappers;
 using GameLibraryAPI.Models;
@@ -19,15 +20,26 @@ namespace GameLibraryAPI.Repository
             _context = context;
         }
 
-        public async Task<List<Game>> GetAllAsync(string? genre = null)
+        public async Task<List<Game>> GetAllAsync(GameQueryObject query)
         {
-            var query = _context.Games.AsQueryable();
+            var games = _context.Games.AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(genre))
+            if (!string.IsNullOrWhiteSpace(query.Name))
             {
-                query = query.Where(g => g.Genre.ToLower() == genre.ToLower());
+                games = games.Where(g => g.Name.ToLower().Contains(query.Name.ToLower()));
             }
-            return await query.ToListAsync();
+            
+            if (!string.IsNullOrWhiteSpace(query.Genre))
+            {
+                games = games.Where(g => g.Genre.ToLower() == query.Genre.ToLower());
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.DeveloperName))
+            {
+                games = games.Where(g => g.DeveloperName.ToLower() == query.DeveloperName.ToLower());
+            }
+
+            return await games.ToListAsync();
         }
 
         public async Task<Game?> GetByIdAsync(int id)
