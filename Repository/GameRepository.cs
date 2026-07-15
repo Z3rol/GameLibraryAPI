@@ -19,9 +19,15 @@ namespace GameLibraryAPI.Repository
             _context = context;
         }
 
-        public async Task<List<Game>> GetAllAsync()
+        public async Task<List<Game>> GetAllAsync(string? genre = null)
         {
-            return await _context.Games.ToListAsync();
+            var query = _context.Games.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(genre))
+            {
+                query = query.Where(g => g.Genre.ToLower() == genre.ToLower());
+            }
+            return await query.ToListAsync();
         }
 
         public async Task<Game?> GetByIdAsync(int id)

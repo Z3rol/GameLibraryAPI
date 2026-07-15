@@ -10,7 +10,7 @@ namespace GameLibraryAPI.Interfaces
 {
     public interface IGameRepository
     {
-        public Task<List<Game>> GetAllAsync();
+        public Task<List<Game>> GetAllAsync(string? genre = null);
         public Task<Game?> GetByIdAsync(int id);
         public Task<Game> CreateAsync(Game gameModel);
         public Task<Game?> UpdateDatailsAsync(int id, UpdateGameDetailsDto updateDto);

@@ -21,9 +21,9 @@ namespace GameLibraryAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] string? genre)
         {
-            var games = await _gameRepo.GetAllAsync();
+            var games = await _gameRepo.GetAllAsync(genre);
             var gamesDto = games.Select(g => g.ToGameDto());
 
             return Ok(gamesDto);
