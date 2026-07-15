@@ -21,6 +21,6 @@ namespace GameLibraryAPI.DTOs.Game
         [Range(0.0, double.MaxValue, ErrorMessage = "Price must be greater than or equal to 0.")]
         public double Price { get; set; }
         [Required(ErrorMessage = "Release date is required.")]
-        public DateOnly ReleasedOn { get; set; }
+        public DateOnly ReleaseDate { get; set; }
     }
 }

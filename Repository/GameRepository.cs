@@ -49,7 +49,7 @@ namespace GameLibraryAPI.Repository
                 }
                 else if (query.SortBy.Equals("ReleasedOn", StringComparison.OrdinalIgnoreCase))
                 {
-                    games = query.IsDescending ? games.OrderByDescending(g => g.ReleasedOn) : games.OrderBy(g => g.ReleasedOn);
+                    games = query.IsDescending ? games.OrderByDescending(g => g.ReleaseDate) : games.OrderBy(g => g.ReleaseDate);
                 }
             }
 
@@ -76,7 +76,7 @@ namespace GameLibraryAPI.Repository
             game.Name = updateDto.Name;
             game.Genre = updateDto.Genre;
             game.DeveloperName = updateDto.DeveloperName;
-            game.ReleasedOn = updateDto.ReleasedOn;
+            game.ReleaseDate = updateDto.ReleaseDate;
 
             await _context.SaveChangesAsync();
             return game;

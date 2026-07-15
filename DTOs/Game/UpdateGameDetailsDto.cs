@@ -18,6 +18,6 @@ namespace GameLibraryAPI.DTOs.Game
         [StringLength(100, MinimumLength = 1, ErrorMessage = "Game developer's name must be between 1 and 100 characters.")]
         public string DeveloperName { get; set; } = "";
         [Required(ErrorMessage = "Release date is required.")]
-        public DateOnly ReleasedOn { get; set; }
+        public DateOnly ReleaseDate { get; set; }
     }
 }
