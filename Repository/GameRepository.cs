@@ -75,5 +75,10 @@ namespace GameLibraryAPI.Repository
         {
             return await _context.Games.AnyAsync(g => g.Name.ToLower() == name.ToLower());
         }
+
+        public async Task<bool> GameExistsAsync(int id)
+        {
+            return await _context.Games.AnyAsync(g => g.Id == id);
+        }
     }
 }

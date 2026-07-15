@@ -31,8 +31,14 @@ namespace GameLibraryAPI.Repository
                 .AnyAsync(ug => ug.AppUserId == userId && ug.GameId == gameId);
         }
 
-        public async Task<UserGame> AddGameToLibraryAsync(UserGame userGame)
+        public async Task<UserGame> AddGameToLibraryAsync(string userId, int gameId)
         {
+            var userGame = new UserGame
+            {
+                AppUserId = userId,
+                GameId = gameId
+            };
+
             await _context.UserGames.AddAsync(userGame);
             await _context.SaveChangesAsync();
             return userGame;

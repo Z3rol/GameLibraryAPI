@@ -23,10 +23,12 @@ namespace GameLibraryAPI.Controllers
     {
         private readonly ILibraryRepository _libraryRepo;
         private readonly UserManager<AppUser> _userManager;
-        public LibraryController(ILibraryRepository libraryRepo, UserManager<AppUser> userManager)
+        private readonly IGameRepository _gameRepo;
+        public LibraryController(ILibraryRepository libraryRepo, UserManager<AppUser> userManager, IGameRepository gameRepo)
         {
             _libraryRepo = libraryRepo;
             _userManager = userManager;
+            _gameRepo = gameRepo;
         }
 
         [HttpGet]
@@ -51,17 +53,13 @@ namespace GameLibraryAPI.Controllers
             var user = await _userManager.FindByNameAsync(userName);
             if (user == null) return NotFound("User not found.");
 
+            var gameExists = await _gameRepo.GameExistsAsync(gameId);
+            if (!gameExists) return NotFound("Game does not exist");
+
             var userOwnsGame = await _libraryRepo.UserOwnsGameAsync(user.Id, gameId);
             if (userOwnsGame) return BadRequest("You already own this game.");
-
-            var userGame = new UserGame
-            {
-                AppUserId = user.Id,
-                GameId = gameId
-            };
             
-            await _libraryRepo.AddGameToLibraryAsync(userGame);
-
+            await _libraryRepo.AddGameToLibraryAsync(user.Id, gameId);
             return Ok("Game successfully added to your library.");
         }
 

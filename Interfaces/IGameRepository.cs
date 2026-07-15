@@ -17,5 +17,6 @@ namespace GameLibraryAPI.Interfaces
         public Task<Game?> UpdatePriceAsync(int id, double newPrice);
         public Task<Game?> DeleteAsync(int id);
         public Task<bool> GameExistsAsync(string name);
+        public Task<bool> GameExistsAsync(int id);
     }
 }
