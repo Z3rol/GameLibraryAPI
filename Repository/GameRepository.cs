@@ -53,7 +53,9 @@ namespace GameLibraryAPI.Repository
                 }
             }
 
-            return await games.ToListAsync();
+            var skipPages = (query.PageNumber - 1) * query.PageSize;
+
+            return await games.Skip(skipPages).Take(query.PageSize).ToListAsync();
         }
 
         public async Task<Game?> GetByIdAsync(int id)
