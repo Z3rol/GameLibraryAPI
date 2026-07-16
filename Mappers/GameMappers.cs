@@ -18,7 +18,7 @@ namespace GameLibraryAPI.Mappers
                 Genre = game.Genre,
                 DeveloperName = game.DeveloperName,
                 Price = game.Price,
-                ReleasedOn = game.ReleasedOn
+                ReleaseDate = game.ReleaseDate
             };
         }
 
@@ -30,7 +30,7 @@ namespace GameLibraryAPI.Mappers
                 Genre = gameDto.Genre,
                 DeveloperName = gameDto.DeveloperName,
                 Price = gameDto.Price,
-                ReleasedOn = gameDto.ReleasedOn
+                ReleaseDate = gameDto.ReleaseDate
             };
         }
     }
