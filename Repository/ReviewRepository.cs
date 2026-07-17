@@ -30,7 +30,7 @@ namespace GameLibraryAPI.Repository
             return await _context.Reviews
                 .Include(r => r.AppUser)
                 .Include(r => r.Game)
-                .Where(r => r.AppUser.UserName!.Equals(username, StringComparison.CurrentCultureIgnoreCase))
+                .Where(r => r.AppUser.UserName!.ToLower() == username.ToLower())
                 .ToListAsync();
         }
     }
