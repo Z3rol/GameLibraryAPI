@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GameLibraryAPI.DTOs.Review;
+using GameLibraryAPI.Extensions;
 using GameLibraryAPI.Interfaces;
 using GameLibraryAPI.Mappers;
 using GameLibraryAPI.Models;
@@ -50,6 +52,25 @@ namespace GameLibraryAPI.Controllers
             var reviewsDto = reviews.Select(r => r.ToReviewDto());
 
             return Ok(reviewsDto);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateReview([FromBody] CreateReviewRequestDto createDto)
+        {
+            var username = User.GetUserName();
+            if (string.IsNullOrWhiteSpace(username)) return Unauthorized("Could not extract username from token claims");
+
+            var appUser = await _userManager.FindByNameAsync(username);
+            if (appUser == null) return Unauthorized("User context not found");
+
+            var gameExists = await _gameRepo.GameExistsAsync(createDto.GameId ?? 0);
+            if (!gameExists) return NotFound("Game does not exist");
+
+            var reviewModel = createDto.ToReviewFromCreate(appUser.Id);
+
+            await _reviewRepo.CreateReviewAsync(reviewModel);
+            
+            return CreatedAtAction(nameof(GetReviewsByGameId), new { gameId = reviewModel.GameId }, reviewModel.ToReviewDto());
         }
     }
 }

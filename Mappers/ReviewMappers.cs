@@ -21,5 +21,18 @@ namespace GameLibraryAPI.Mappers
                 GameId = review.GameId
             };
         }
+
+        public static Review ToReviewFromCreate(this CreateReviewRequestDto createDto, string userId)
+        {
+            return new Review
+            {
+                Title = createDto.Title,
+                Content = createDto.Content,
+                Rating = createDto.Rating,
+                GameId = createDto.GameId ?? 0,
+                AppUserId = userId,
+                CreatedOn = DateTime.UtcNow
+            };
+        }
     }
 }

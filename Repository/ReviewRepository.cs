@@ -33,5 +33,12 @@ namespace GameLibraryAPI.Repository
                 .Where(r => r.AppUser.UserName!.ToLower() == username.ToLower())
                 .ToListAsync();
         }
+
+        public async Task<Review> CreateReviewAsync(Review review)
+        {
+            await _context.Reviews.AddAsync(review);
+            await _context.SaveChangesAsync();
+            return review;
+        }
     }
 }
