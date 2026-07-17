@@ -32,8 +32,8 @@ namespace GameLibraryAPI.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetReviewsByGameId([FromRoute] int gameId)
         {
-            var existingGame = await _gameRepo.GetByIdAsync(gameId);
-            if (existingGame == null) return NotFound("Game does not exist");
+            var gameExists = await _gameRepo.GameExistsAsync(gameId);
+            if (!gameExists) return NotFound("Game does not exist");
 
             var reviews = await _reviewRepo.GetReviewsByGameIdAsync(gameId);
             var reviewsDto = reviews.Select(r => r.ToReviewDto());
