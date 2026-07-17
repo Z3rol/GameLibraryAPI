@@ -1,0 +1,55 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using GameLibraryAPI.Interfaces;
+using GameLibraryAPI.Mappers;
+using GameLibraryAPI.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+
+namespace GameLibraryAPI.Controllers
+{
+    [Route("api/review")]
+    [ApiController]
+    [Authorize]
+    public class ReviewController : ControllerBase
+    {
+        private readonly IReviewRepository _reviewRepo;
+        private readonly IGameRepository _gameRepo;
+        private readonly UserManager<AppUser> _userManager;
+        public ReviewController(IReviewRepository reviewRepo, IGameRepository gameRepo, UserManager<AppUser> userManager)
+        {
+            _reviewRepo = reviewRepo;
+            _gameRepo = gameRepo;
+            _userManager = userManager;
+        }
+
+        [HttpGet("game/{gameId:int}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetReviewsByGameId([FromRoute] int gameId)
+        {
+            var existingGame = await _gameRepo.GetByIdAsync(gameId);
+            if (existingGame == null) return NotFound("Game does not exist");
+
+            var reviews = await _reviewRepo.GetReviewsByGameIdAsync(gameId);
+            var reviewsDto = reviews.Select(r => r.ToReviewDto());
+
+            return Ok(reviewsDto);
+        }
+
+        [HttpGet("user/{username}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetReviewsByUsername([FromRoute] string username)
+        {
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null) return NotFound($"User '{username}' does not exist");
+
+            var reviews = await _reviewRepo.GetReviewsByUsernameAsync(username);
+            var reviewsDto = reviews.Select(r => r.ToReviewDto());
+
+            return Ok(reviewsDto);
+        }
+    }
+}

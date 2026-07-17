@@ -25,12 +25,12 @@ namespace GameLibraryAPI.Repository
                 .ToListAsync();
         }
 
-        public async Task<List<Review>> GetReviewsByUserIdAsync(string userId)
+        public async Task<List<Review>> GetReviewsByUsernameAsync(string username)
         {
             return await _context.Reviews
-                .Where(r => r.AppUserId == userId)
-                .Include(r => r.Game)
                 .Include(r => r.AppUser)
+                .Include(r => r.Game)
+                .Where(r => r.AppUser.UserName!.Equals(username, StringComparison.CurrentCultureIgnoreCase))
                 .ToListAsync();
         }
     }
