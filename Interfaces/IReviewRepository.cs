@@ -9,5 +9,6 @@ namespace GameLibraryAPI.Interfaces
     public interface IReviewRepository
     {
         public Task<List<Review>> GetReviewsByGameIdAsync(int gameId);
+        public Task<List<Review>> GetReviewsByUserIdAsync(string userId);
     }
 }
