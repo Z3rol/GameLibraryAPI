@@ -17,6 +17,11 @@ namespace GameLibraryAPI.Repository
             _context = context;
         }
 
+        public async Task<Review?> GetReviewByIdAsync(int reviewId)
+        {
+            return await _context.Reviews.FindAsync(reviewId);
+        }
+
         public async Task<List<Review>> GetReviewsByGameIdAsync(int gameId)
         {
             return await _context.Reviews
@@ -37,6 +42,16 @@ namespace GameLibraryAPI.Repository
         public async Task<Review> CreateReviewAsync(Review review)
         {
             await _context.Reviews.AddAsync(review);
+            await _context.SaveChangesAsync();
+            return review;
+        }
+
+        public async Task<Review?> DeleteReviewAsync(int reviewId)
+        {
+            var review = await _context.Reviews.FindAsync(reviewId);
+            if (review == null) return null;
+
+            _context.Remove(review);
             await _context.SaveChangesAsync();
             return review;
         }

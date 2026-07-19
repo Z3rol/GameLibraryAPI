@@ -72,5 +72,23 @@ namespace GameLibraryAPI.Controllers
             
             return CreatedAtAction(nameof(GetReviewsByGameId), new { gameId = reviewModel.GameId }, reviewModel.ToReviewDto());
         }
+
+        [HttpDelete("{reviewId:int}")]
+        public async Task<IActionResult> DeleteReview([FromRoute] int reviewId)
+        {
+            var username = User.GetUserName();
+            if (string.IsNullOrWhiteSpace(username)) return Unauthorized("Could not extract username from token claims");
+
+            var appUser = await _userManager.FindByNameAsync(username);
+            if (appUser == null) return Unauthorized("User context not found");
+
+            var review = await _reviewRepo.GetReviewByIdAsync(reviewId);
+            if (review == null) return NotFound("Review does not exist");
+
+            if (review.AppUserId != appUser.Id) return Forbid();
+
+            await _reviewRepo.DeleteReviewAsync(reviewId);
+            return NoContent();
+        }
     }
 }
