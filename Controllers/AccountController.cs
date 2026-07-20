@@ -59,9 +59,9 @@ namespace GameLibraryAPI.Controllers
                     return StatusCode(500, createdUser.Errors);
                 }
             }
-            catch(Exception e)
+            catch(Exception)
             {
-                return StatusCode(500, e.Message);
+                return StatusCode(500, "Something went wrong while registering");
             }
         }
 
