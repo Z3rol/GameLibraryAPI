@@ -73,8 +73,8 @@ namespace GameLibraryAPI.Controllers
                 }
             }
 
-            var updatedGame = await _gameRepo.UpdateDatailsAsync(id, updateDto);
-            return Ok(updatedGame);
+            var updatedGame = await _gameRepo.UpdateDatailsAsync(existingGame, updateDto);
+            return Ok(updatedGame.ToGameDto());
         }
 
         [HttpPatch("{id}/price")]

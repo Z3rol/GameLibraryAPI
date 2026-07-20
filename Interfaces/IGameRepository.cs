@@ -14,7 +14,7 @@ namespace GameLibraryAPI.Interfaces
         public Task<List<Game>> GetAllAsync(GameQueryObject query);
         public Task<Game?> GetByIdAsync(int id);
         public Task<Game> CreateAsync(Game gameModel);
-        public Task<Game?> UpdateDatailsAsync(int id, UpdateGameDetailsDto updateDto);
+        public Task<Game> UpdateDatailsAsync(Game game, UpdateGameDetailsDto updateDto);
         public Task<Game?> UpdatePriceAsync(int id, double newPrice);
         public Task<Game?> DeleteAsync(int id);
         public Task<bool> GameExistsAsync(string name);

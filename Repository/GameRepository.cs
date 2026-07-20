@@ -70,11 +70,8 @@ namespace GameLibraryAPI.Repository
             return gameModel;
         }
 
-        public async Task<Game?> UpdateDatailsAsync(int id, UpdateGameDetailsDto updateDto)
+        public async Task<Game> UpdateDatailsAsync(Game game, UpdateGameDetailsDto updateDto)
         {
-            var game = await _context.Games.FindAsync(id);
-            if (game == null) return null;
-
             game.Name = updateDto.Name;
             game.Genre = updateDto.Genre;
             game.DeveloperName = updateDto.DeveloperName;
