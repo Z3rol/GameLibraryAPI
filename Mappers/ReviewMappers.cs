@@ -18,6 +18,7 @@ namespace GameLibraryAPI.Mappers
                 Content = review.Content,
                 Rating = review.Rating,
                 CreatedOn = review.CreatedOn,
+                CreatedBy = review.AppUser?.UserName ?? "",
                 GameId = review.GameId
             };
         }

@@ -20,7 +20,7 @@ namespace GameLibraryAPI.Repository
 
         public async Task<Review?> GetReviewByIdAsync(int reviewId)
         {
-            return await _context.Reviews.FindAsync(reviewId);
+            return await _context.Reviews.Include(r => r.AppUser).FirstOrDefaultAsync(r => r.Id == reviewId);
         }
 
         public async Task<List<Review>> GetReviewsByGameIdAsync(int gameId)
