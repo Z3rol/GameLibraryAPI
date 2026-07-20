@@ -45,7 +45,7 @@ namespace GameLibraryAPI.Controllers
             return Ok(userGamesDto);
         }
 
-        [HttpPost("{gameId}")]
+        [HttpPost("~/api/library/{gameId}")]
         public async Task<IActionResult> AddGameToLibrary([FromRoute] int gameId)
         {
             var userName = User.GetUserName();
@@ -63,7 +63,7 @@ namespace GameLibraryAPI.Controllers
             return Ok("Game successfully added to your library.");
         }
 
-        [HttpDelete("{gameId}")]
+        [HttpDelete("~/api/library/{gameId}")]
         public async Task<IActionResult> RemoveGameFromLibrary([FromRoute] int gameId)
         {
             var username = User.GetUserName();
