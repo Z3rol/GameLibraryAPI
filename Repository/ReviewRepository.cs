@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GameLibraryAPI.Data;
+using GameLibraryAPI.DTOs.Review;
 using GameLibraryAPI.Interfaces;
 using GameLibraryAPI.Models;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +43,16 @@ namespace GameLibraryAPI.Repository
         public async Task<Review> CreateReviewAsync(Review review)
         {
             await _context.Reviews.AddAsync(review);
+            await _context.SaveChangesAsync();
+            return review;
+        }
+
+        public async Task<Review> UpdateReviewAsync(Review review, UpdateReviewRequestDto updateDto)
+        {
+            review.Title = updateDto.Title ?? review.Title;
+            review.Content = updateDto.Content ?? review.Content;
+            review.Rating = updateDto.Rating ?? review.Rating;
+
             await _context.SaveChangesAsync();
             return review;
         }

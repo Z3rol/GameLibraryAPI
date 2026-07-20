@@ -73,6 +73,29 @@ namespace GameLibraryAPI.Controllers
             return CreatedAtAction(nameof(GetReviewsByGameId), new { gameId = reviewModel.GameId }, reviewModel.ToReviewDto());
         }
 
+        [HttpPut("{reviewId:int}")]
+        public async Task<IActionResult> UpdateReview([FromRoute] int reviewId, [FromBody] UpdateReviewRequestDto updateDto)
+        {
+            var hasAnyValue = typeof(UpdateReviewRequestDto)
+                .GetProperties()
+                .Any(p => p.GetValue(updateDto) != null);
+            if (!hasAnyValue) return BadRequest("Atleast one field must be provided");
+
+            var username = User.GetUserName();
+            if (string.IsNullOrWhiteSpace(username)) return Unauthorized("Could not extract username from token claims");
+
+            var appUser = await _userManager.FindByNameAsync(username);
+            if (appUser == null) return Unauthorized("User context not found");
+
+            var review = await _reviewRepo.GetReviewByIdAsync(reviewId);
+            if (review == null) return NotFound("Review does not exist");
+
+            if (review.AppUserId != appUser.Id) return Forbid();
+
+            var updatedReview = await _reviewRepo.UpdateReviewAsync(review, updateDto);
+            return Ok(updatedReview.ToReviewDto());
+        }
+
         [HttpDelete("{reviewId:int}")]
         public async Task<IActionResult> DeleteReview([FromRoute] int reviewId)
         {
