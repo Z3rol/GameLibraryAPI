@@ -66,6 +66,9 @@ namespace GameLibraryAPI.Controllers
             var gameExists = await _gameRepo.GameExistsAsync(createDto.GameId ?? 0);
             if (!gameExists) return NotFound("Game does not exist");
 
+            var reviewExists = await _reviewRepo.UserHasReviewedGameAsync(appUser.Id, createDto.GameId ?? 0);
+            if (reviewExists) return BadRequest("User already has a review of this game");
+
             var reviewModel = createDto.ToReviewFromCreate(appUser.Id);
 
             await _reviewRepo.CreateReviewAsync(reviewModel);

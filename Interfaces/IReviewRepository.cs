@@ -15,5 +15,6 @@ namespace GameLibraryAPI.Interfaces
         public Task<Review> CreateReviewAsync(Review review);
         public Task<Review> UpdateReviewAsync(Review review, UpdateReviewRequestDto updateDto);
         public Task<Review?> DeleteReviewAsync(int reviewId);
+        public Task<bool> UserHasReviewedGameAsync(string userId, int gameId);
     }
 }

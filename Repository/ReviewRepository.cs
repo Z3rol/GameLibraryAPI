@@ -66,5 +66,10 @@ namespace GameLibraryAPI.Repository
             await _context.SaveChangesAsync();
             return review;
         }
+
+        public async Task<bool> UserHasReviewedGameAsync(string userId, int gameId)
+        {
+            return await _context.Reviews.AnyAsync(r => r.AppUserId == userId && r.GameId == gameId);
+        }
     }
 }
