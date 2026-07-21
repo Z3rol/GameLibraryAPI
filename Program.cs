@@ -1,6 +1,7 @@
 using System.Text;
 using GameLibraryAPI.Data;
 using GameLibraryAPI.Interfaces;
+using GameLibraryAPI.Middleware;
 using GameLibraryAPI.Models;
 using GameLibraryAPI.Repository;
 using GameLibraryAPI.Services;
@@ -25,6 +26,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
@@ -73,6 +77,8 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
