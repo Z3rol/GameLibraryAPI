@@ -20,7 +20,7 @@ namespace GameLibraryAPI.Repository
             _context = context;
         }
 
-        public async Task<List<Game>> GetAllAsync(GameQueryObject query)
+        public async Task<List<GameDto>> GetAllAsync(GameQueryObject query)
         {
             var games = _context.Games.AsQueryable();
 
@@ -55,7 +55,22 @@ namespace GameLibraryAPI.Repository
 
             var skipPages = (query.PageNumber - 1) * query.PageSize;
 
-            return await games.Skip(skipPages).Take(query.PageSize).ToListAsync();
+            return await games
+                .Select(g => new GameDto
+                {
+                    Id = g.Id,
+                    Name = g.Name,
+                    Genre = g.Genre,
+                    DeveloperName = g.DeveloperName,
+                    ReleaseDate = g.ReleaseDate,
+                    Price = g.Price,
+                    AverageRating = g.Reviews.Any()
+                        ? Math.Round(g.Reviews.Average(r => r.Rating), 1, MidpointRounding.AwayFromZero)
+                        : 0
+                })
+                .Skip(skipPages)
+                .Take(query.PageSize)
+                .ToListAsync();
         }
 
         public async Task<Game?> GetByIdAsync(int id)

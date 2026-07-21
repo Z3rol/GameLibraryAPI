@@ -26,9 +26,8 @@ namespace GameLibraryAPI.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAll([FromQuery] GameQueryObject query)
         {
-            var games = await _gameRepo.GetAllAsync(query);
-            var gamesDto = games.Select(g => g.ToGameDto());
-
+            var gamesDto = await _gameRepo.GetAllAsync(query);
+            
             return Ok(gamesDto);
         }
 

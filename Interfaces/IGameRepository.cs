@@ -11,7 +11,7 @@ namespace GameLibraryAPI.Interfaces
 {
     public interface IGameRepository
     {
-        public Task<List<Game>> GetAllAsync(GameQueryObject query);
+        public Task<List<GameDto>> GetAllAsync(GameQueryObject query);
         public Task<Game?> GetByIdAsync(int id);
         public Task<Game> CreateAsync(Game gameModel);
         public Task<Game> UpdateDatailsAsync(Game game, UpdateGameDetailsDto updateDto);

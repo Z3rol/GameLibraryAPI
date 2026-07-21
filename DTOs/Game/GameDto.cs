@@ -14,5 +14,6 @@ namespace GameLibraryAPI.DTOs.Game
         public string DeveloperName { get; set; } = "";
         public double Price { get; set; }
         public DateOnly ReleaseDate { get; set; }
+        public double AverageRating { get; set; }
     }
 }
