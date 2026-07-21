@@ -76,8 +76,8 @@ namespace GameLibraryAPI.Controllers
             return CreatedAtAction(nameof(GetReviewsByGameId), new { gameId = reviewModel.GameId }, reviewModel.ToReviewDto());
         }
 
-        [HttpPut("{reviewId:int}")]
-        public async Task<IActionResult> UpdateReview([FromRoute] int reviewId, [FromBody] UpdateReviewRequestDto updateDto)
+        [HttpPut("{gameId:int}")]
+        public async Task<IActionResult> UpdateReview([FromRoute] int gameId, [FromBody] UpdateReviewRequestDto updateDto)
         {
             var hasAnyValue = typeof(UpdateReviewRequestDto)
                 .GetProperties()
@@ -90,17 +90,15 @@ namespace GameLibraryAPI.Controllers
             var appUser = await _userManager.FindByNameAsync(username);
             if (appUser == null) return Unauthorized("User context not found");
 
-            var review = await _reviewRepo.GetReviewByIdAsync(reviewId);
-            if (review == null) return NotFound("Review does not exist");
-
-            if (review.AppUserId != appUser.Id) return Forbid();
+            var review = await _reviewRepo.GetReviewByUserAndGameAsync(appUser.Id, gameId);
+            if (review == null) return NotFound("You have not reviewed this game");
 
             var updatedReview = await _reviewRepo.UpdateReviewAsync(review, updateDto);
             return Ok(updatedReview.ToReviewDto());
         }
 
-        [HttpDelete("{reviewId:int}")]
-        public async Task<IActionResult> DeleteReview([FromRoute] int reviewId)
+        [HttpDelete("{gameId:int}")]
+        public async Task<IActionResult> DeleteReview([FromRoute] int gameId)
         {
             var username = User.GetUserName();
             if (string.IsNullOrWhiteSpace(username)) return Unauthorized("Could not extract username from token claims");
@@ -108,12 +106,10 @@ namespace GameLibraryAPI.Controllers
             var appUser = await _userManager.FindByNameAsync(username);
             if (appUser == null) return Unauthorized("User context not found");
 
-            var review = await _reviewRepo.GetReviewByIdAsync(reviewId);
+            var review = await _reviewRepo.GetReviewByUserAndGameAsync(appUser.Id, gameId);
             if (review == null) return NotFound("Review does not exist");
 
-            if (review.AppUserId != appUser.Id) return Forbid();
-
-            await _reviewRepo.DeleteReviewAsync(reviewId);
+            await _reviewRepo.DeleteReviewAsync(review.Id);
             return NoContent();
         }
     }
