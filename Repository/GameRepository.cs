@@ -43,11 +43,7 @@ namespace GameLibraryAPI.Repository
             // Sorting
             if (!string.IsNullOrWhiteSpace(query.SortBy))
             {
-                if (query.SortBy.Equals("Price", StringComparison.OrdinalIgnoreCase))
-                {
-                    games = query.IsDescending ? games.OrderByDescending(g => g.Price) : games.OrderBy(g => g.Price);
-                }
-                else if (query.SortBy.Equals("ReleaseDate", StringComparison.OrdinalIgnoreCase))
+                if (query.SortBy.Equals("ReleaseDate", StringComparison.OrdinalIgnoreCase))
                 {
                     games = query.IsDescending ? games.OrderByDescending(g => g.ReleaseDate) : games.OrderBy(g => g.ReleaseDate);
                 }
@@ -63,7 +59,6 @@ namespace GameLibraryAPI.Repository
                     Genre = g.Genre,
                     DeveloperName = g.DeveloperName,
                     ReleaseDate = g.ReleaseDate,
-                    Price = g.Price,
                     AverageRating = g.Reviews.Any()
                         ? Math.Round(g.Reviews.Average(r => r.Rating), 1, MidpointRounding.AwayFromZero)
                         : 0
@@ -84,7 +79,6 @@ namespace GameLibraryAPI.Repository
                     Genre = g.Genre,
                     DeveloperName = g.DeveloperName,
                     ReleaseDate = g.ReleaseDate,
-                    Price = g.Price,
                     AverageRating = g.Reviews.Any()
                         ? Math.Round(g.Reviews.Average(r => r.Rating), 1, MidpointRounding.AwayFromZero)
                         : 0
@@ -111,17 +105,6 @@ namespace GameLibraryAPI.Repository
             game.DeveloperName = updateDto.DeveloperName;
             game.ReleaseDate = updateDto.ReleaseDate;
 
-            await _context.SaveChangesAsync();
-            return game;
-        }
-
-        public async Task<Game?> UpdatePriceAsync(int id, double newPrice)
-        {
-            var game = await _context.Games.FindAsync(id);
-            if (game == null) return null;
-
-            game.Price = newPrice;
-            
             await _context.SaveChangesAsync();
             return game;
         }

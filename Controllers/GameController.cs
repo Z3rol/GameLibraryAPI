@@ -72,15 +72,6 @@ namespace GameLibraryAPI.Controllers
             return Ok(updatedGame.ToGameDto());
         }
 
-        [HttpPatch("{id}/price")]
-        public async Task<IActionResult> UpdatePrice([FromRoute] int id, [FromBody] UpdateGamePriceDto updateDto)
-        {
-            var game = await _gameRepo.UpdatePriceAsync(id, updateDto.Price);
-            if (game == null) return NotFound("Game not found.");
-
-            return Ok(game.ToGameDto());
-        }
-
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
