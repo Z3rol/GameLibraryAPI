@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GameLibraryAPI.DTOs.Review;
 using GameLibraryAPI.Extensions;
+using GameLibraryAPI.Helpers;
 using GameLibraryAPI.Interfaces;
 using GameLibraryAPI.Mappers;
 using GameLibraryAPI.Models;
@@ -30,13 +31,12 @@ namespace GameLibraryAPI.Controllers
 
         [HttpGet("game/{gameId:int}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetReviewsByGameId([FromRoute] int gameId)
+        public async Task<IActionResult> GetReviewsByGameId([FromRoute] int gameId, [FromQuery] ReviewQueryObject query)
         {
             var gameExists = await _gameRepo.GameExistsAsync(gameId);
             if (!gameExists) return NotFound("Game does not exist");
 
-            var reviews = await _reviewRepo.GetReviewsByGameIdAsync(gameId);
-            var reviewsDto = reviews.Select(r => r.ToReviewDto());
+            var reviewsDto = await _reviewRepo.GetReviewsByGameIdAsync(gameId, query);;
 
             return Ok(reviewsDto);
         }
