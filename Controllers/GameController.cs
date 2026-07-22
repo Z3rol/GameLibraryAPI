@@ -35,10 +35,10 @@ namespace GameLibraryAPI.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
-            var game = await _gameRepo.GetByIdAsync(id);
-            if (game == null) return NotFound("Game not found");
+            var gameDto = await _gameRepo.GetByIdAsync(id);
+            if (gameDto == null) return NotFound("Game not found");
 
-            return Ok(game.ToGameDto());
+            return Ok(gameDto);
         }
 
         [HttpPost]
@@ -56,7 +56,7 @@ namespace GameLibraryAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateDetails([FromRoute] int id, [FromBody] UpdateGameDetailsDto updateDto)
         {
-            var existingGame = await _gameRepo.GetByIdAsync(id);
+            var existingGame = await _gameRepo.GetGameEntityByIdAsync(id);
             if (existingGame == null) return NotFound("Game not found.");
             
             if (updateDto.Name != existingGame.Name)

@@ -47,7 +47,7 @@ namespace GameLibraryAPI.Repository
                 {
                     games = query.IsDescending ? games.OrderByDescending(g => g.Price) : games.OrderBy(g => g.Price);
                 }
-                else if (query.SortBy.Equals("ReleasedOn", StringComparison.OrdinalIgnoreCase))
+                else if (query.SortBy.Equals("ReleaseDate", StringComparison.OrdinalIgnoreCase))
                 {
                     games = query.IsDescending ? games.OrderByDescending(g => g.ReleaseDate) : games.OrderBy(g => g.ReleaseDate);
                 }
@@ -73,7 +73,26 @@ namespace GameLibraryAPI.Repository
                 .ToListAsync();
         }
 
-        public async Task<Game?> GetByIdAsync(int id)
+        public async Task<GameDto?> GetByIdAsync(int id)
+        {
+            return await _context.Games
+                .Where(g => g.Id == id)
+                .Select(g => new GameDto
+                {
+                    Id = g.Id,
+                    Name = g.Name,
+                    Genre = g.Genre,
+                    DeveloperName = g.DeveloperName,
+                    ReleaseDate = g.ReleaseDate,
+                    Price = g.Price,
+                    AverageRating = g.Reviews.Any()
+                        ? Math.Round(g.Reviews.Average(r => r.Rating), 1, MidpointRounding.AwayFromZero)
+                        : 0
+                })
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<Game?> GetGameEntityByIdAsync(int id)
         {
             return await _context.Games.FindAsync(id);
         }
