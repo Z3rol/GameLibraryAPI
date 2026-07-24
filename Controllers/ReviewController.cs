@@ -43,13 +43,12 @@ namespace GameLibraryAPI.Controllers
 
         [HttpGet("user/{username}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetReviewsByUsername([FromRoute] string username)
+        public async Task<IActionResult> GetReviewsByUsername([FromRoute] string username, [FromQuery] ReviewQueryObject query)
         {
             var user = await _userManager.FindByNameAsync(username);
             if (user == null) return NotFound($"User '{username}' does not exist");
 
-            var reviews = await _reviewRepo.GetReviewsByUsernameAsync(username);
-            var reviewsDto = reviews.Select(r => r.ToReviewDto());
+            var reviewsDto = await _reviewRepo.GetReviewsByUsernameAsync(username, query);
 
             return Ok(reviewsDto);
         }

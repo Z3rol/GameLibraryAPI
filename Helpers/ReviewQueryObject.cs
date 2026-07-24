@@ -8,6 +8,7 @@ namespace GameLibraryAPI.Helpers
 {
     public class ReviewQueryObject : QueryObjectBase
     {
+        public string? GameName { get; set; } = null;
         [Range(0.1, 10.0)]
         public double? MinRating { get; set; }
         [Range(0.1, 10.0)]

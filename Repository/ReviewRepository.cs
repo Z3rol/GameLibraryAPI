@@ -86,12 +86,64 @@ namespace GameLibraryAPI.Repository
                 .ToListAsync();
         }
 
-        public async Task<List<Review>> GetReviewsByUsernameAsync(string username)
+        public async Task<List<ReviewDto>> GetReviewsByUsernameAsync(string username, ReviewQueryObject query)
         {
-            return await _context.Reviews
-                .Include(r => r.AppUser)
-                .Include(r => r.Game)
-                .Where(r => r.AppUser.UserName!.ToLower() == username.ToLower())
+            var reviews = _context.Reviews.Where(r => r.AppUser.UserName == username);
+
+            // Filtering
+            if (query.GameName != null)
+            {
+                reviews = reviews.Where(r => r.Game.Name.ToLower().Contains(query.GameName.ToLower()));
+            }
+            
+            if (query.MinRating != null)
+            {
+                reviews = reviews.Where(r => r.Rating >= query.MinRating);
+            }
+
+            if (query.MaxRating != null)
+            {
+                reviews = reviews.Where(r => r.Rating <= query.MaxRating);
+            }
+
+            if (query.CreatedAfter != null)
+            {
+                reviews = reviews.Where(r => r.CreatedOn >= query.CreatedAfter);
+            }
+
+            if (query.CreatedBefore != null)
+            {
+                reviews = reviews.Where(r => r.CreatedOn <= query.CreatedBefore);
+            }
+
+            // Sorting
+            if (!string.IsNullOrWhiteSpace(query.SortBy))
+            {
+                if (query.SortBy.Equals("Rating", StringComparison.OrdinalIgnoreCase))
+                {
+                    reviews = query.IsDescending ? reviews.OrderByDescending(r => r.Rating) : reviews.OrderBy(r => r.Rating);
+                }
+                else if (query.SortBy.Equals("CreationDate", StringComparison.OrdinalIgnoreCase))
+                {
+                    reviews = query.IsDescending ? reviews.OrderByDescending(r => r.CreatedOn) : reviews.OrderBy(r => r.CreatedOn);
+                }
+            }
+
+            var skipPages = (query.PageNumber - 1) * query.PageSize;
+
+            return await reviews
+                .Select(r => new ReviewDto
+                {
+                    Id = r.Id,
+                    Title = r.Title,
+                    Content = r.Content,
+                    Rating = r.Rating,
+                    CreatedOn = r.CreatedOn,
+                    CreatedBy = r.AppUser.UserName ?? "",
+                    GameId = r.GameId
+                })
+                .Skip(skipPages)
+                .Take(query.PageSize)
                 .ToListAsync();
         }
 
