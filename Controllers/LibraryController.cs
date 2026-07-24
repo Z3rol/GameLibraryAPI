@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using GameLibraryAPI.Data;
 using GameLibraryAPI.Extensions;
+using GameLibraryAPI.Helpers;
 using GameLibraryAPI.Interfaces;
 using GameLibraryAPI.Mappers;
 using GameLibraryAPI.Models;
@@ -33,14 +34,12 @@ namespace GameLibraryAPI.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetUserLibrary([FromRoute] string userName)
+        public async Task<IActionResult> GetUserLibrary([FromRoute] string userName, [FromQuery] LibraryQueryObject query)
         {
             var user = await _userManager.FindByNameAsync(userName);
             if (user == null) return NotFound($"User '{userName}' does not exist.");
 
-            var userGames = await _libraryRepo.GetUserLibraryAsync(user.Id);
-
-            var userGamesDto = userGames.Select(ug => ug.ToGameDto());
+            var userGamesDto = await _libraryRepo.GetUserLibraryAsync(user.Id, query);
 
             return Ok(userGamesDto);
         }

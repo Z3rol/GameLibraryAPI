@@ -7,6 +7,7 @@ namespace GameLibraryAPI.Models
 {
     public class UserGame
     {
+        public DateTime AddedOn { get; set; } = DateTime.UtcNow;
         public string AppUserId { get; set; } = "";
         public AppUser AppUser { get; set; } = null!;
         public int GameId { get; set; }
