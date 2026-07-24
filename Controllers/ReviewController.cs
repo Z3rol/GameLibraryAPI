@@ -48,7 +48,7 @@ namespace GameLibraryAPI.Controllers
             var user = await _userManager.FindByNameAsync(username);
             if (user == null) return NotFound($"User '{username}' does not exist");
 
-            var reviewsDto = await _reviewRepo.GetReviewsByUsernameAsync(username, query);
+            var reviewsDto = await _reviewRepo.GetReviewsByUserIdAsync(user.Id, query);
 
             return Ok(reviewsDto);
         }

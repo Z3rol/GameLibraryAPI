@@ -13,7 +13,7 @@ namespace GameLibraryAPI.Interfaces
         public Task<Review?> GetReviewByIdAsync(int reviewId);
         public Task<Review?> GetReviewByUserAndGameAsync(string userId, int gameId);
         public Task<List<ReviewDto>> GetReviewsByGameIdAsync(int gameId, ReviewQueryObject query);
-        public Task<List<ReviewDto>> GetReviewsByUsernameAsync(string username, ReviewQueryObject query);
+        public Task<List<ReviewDto>> GetReviewsByUserIdAsync(string userId, ReviewQueryObject query);
         public Task<Review> CreateReviewAsync(Review review);
         public Task<Review> UpdateReviewAsync(Review review, UpdateReviewRequestDto updateDto);
         public Task<Review?> DeleteReviewAsync(int reviewId);
