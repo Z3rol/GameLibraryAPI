@@ -36,7 +36,7 @@ namespace GameLibraryAPI.Controllers
             var gameExists = await _gameRepo.GameExistsAsync(gameId);
             if (!gameExists) return NotFound("Game does not exist");
 
-            var reviewsDto = await _reviewRepo.GetReviewsByGameIdAsync(gameId, query);;
+            var reviewsDto = await _reviewRepo.GetReviewsByGameIdAsync(gameId, query);
 
             return Ok(reviewsDto);
         }

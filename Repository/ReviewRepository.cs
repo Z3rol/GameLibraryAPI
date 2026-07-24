@@ -88,7 +88,7 @@ namespace GameLibraryAPI.Repository
 
         public async Task<List<ReviewDto>> GetReviewsByUserIdAsync(string userId, ReviewQueryObject query)
         {
-            var reviews = _context.Reviews.Where(r => r.AppUser.Id == userId);
+            var reviews = _context.Reviews.Where(r => r.AppUserId == userId);
 
             // Filtering
             if (query.GameName != null)
