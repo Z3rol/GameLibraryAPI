@@ -8,6 +8,7 @@ using GameLibraryAPI.Interfaces;
 using GameLibraryAPI.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GameLibraryAPI.Controllers
 {
@@ -96,6 +97,22 @@ namespace GameLibraryAPI.Controllers
                 Email = user.Email,
                 Token = token
             });
+        }
+
+        [HttpPost("promote/{username}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> PromoteToAdmin([FromRoute] string username)
+        {
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null) return NotFound("User does not exist");
+
+            var alreadyAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+            if (alreadyAdmin) return BadRequest("User is already an admin");
+
+            var result = await _userManager.AddToRoleAsync(user, "Admin");
+            if (!result.Succeeded) return BadRequest(result.Errors);
+
+            return Ok($"{username} is now an admin");
         }
     }
 }
