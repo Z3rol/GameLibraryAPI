@@ -30,48 +30,36 @@ namespace GameLibraryAPI.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
-            try
+            var appUser = new AppUser
             {
-                if (!ModelState.IsValid) return BadRequest(ModelState);
+                UserName = registerDto.UserName,
+                Email = registerDto.Email
+            };
 
-                var appUser = new AppUser
+            var createdUser = await _userManager .CreateAsync(appUser, registerDto.Password);
+
+            if (createdUser.Succeeded)
+            {
+                var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
+
+                if (roleResult.Succeeded)
                 {
-                    UserName = registerDto.UserName,
-                    Email = registerDto.Email
-                };
-
-                var createdUser = await _userManager .CreateAsync(appUser, registerDto.Password);
-
-                if (createdUser.Succeeded)
-                {
-                    var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
-
-                    if (roleResult.Succeeded)
-                    {
-                        return Ok("User registered successfully");
-                    }
-                    else
-                    {
-                        return StatusCode(500, roleResult.Errors);
-                    }
+                    return Ok("User registered successfully");
                 }
                 else
                 {
-                    return StatusCode(500, createdUser.Errors);
+                    return StatusCode(500, roleResult.Errors);
                 }
             }
-            catch(Exception)
+            else
             {
-                return StatusCode(500, "Something went wrong while registering");
+                return StatusCode(500, createdUser.Errors);
             }
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest();
-
             var user = await _userManager.FindByNameAsync(loginDto.UserNameOrEmail) ??
                 await _userManager.FindByEmailAsync(loginDto.UserNameOrEmail);
 
