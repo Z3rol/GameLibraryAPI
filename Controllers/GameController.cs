@@ -17,9 +17,11 @@ namespace GameLibraryAPI.Controllers
     public class GameController : ControllerBase
     {
         private readonly IGameRepository _gameRepo;
-        public GameController(IGameRepository gameRepo)
+        private readonly ILogger<GameController> _logger;
+        public GameController(IGameRepository gameRepo, ILogger<GameController> logger)
         {
             _gameRepo = gameRepo;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -45,11 +47,18 @@ namespace GameLibraryAPI.Controllers
         public async Task<IActionResult> Create([FromBody] CreateGameRequestDto gameDto)
         {
             var nameIsTaken = await _gameRepo.GameExistsAsync(gameDto.Name);
-            if (nameIsTaken) return BadRequest("Name is already taken;");
+            if (nameIsTaken)
+            {
+                _logger.LogWarning("Game creation failed: name '{GameName}' already taken", gameDto.Name);
+                return BadRequest("Name is already taken;");
+            }
 
             var gameModel = gameDto.ToGameFromCreate();
 
             await _gameRepo.CreateAsync(gameModel);
+            _logger.LogInformation("Game '{GameName}' (Id: {GameId}) created by {Username}",
+                gameModel.Name, gameModel.Id, User.Identity?.Name ?? "unknown");
+
             return CreatedAtAction(nameof (GetById), new {id = gameModel.Id}, gameModel.ToGameDto());
         }
 
@@ -57,18 +66,26 @@ namespace GameLibraryAPI.Controllers
         public async Task<IActionResult> UpdateDetails([FromRoute] int id, [FromBody] UpdateGameDetailsDto updateDto)
         {
             var existingGame = await _gameRepo.GetGameEntityByIdAsync(id);
-            if (existingGame == null) return NotFound("Game not found.");
+            if (existingGame == null)
+            {
+                _logger.LogWarning("Update failed: game {GameId} not found", id);
+                return NotFound("Game not found.");
+            }
             
             if (updateDto.Name != existingGame.Name)
             {
                 var nameIsTaken = await _gameRepo.GameExistsAsync(updateDto.Name);
                 if (nameIsTaken)
                 {
+                    _logger.LogWarning("Game update failed: name '{GameName}' already taken", existingGame.Name);
                     return BadRequest("A game with this name already exists.");
                 }
             }
 
             var updatedGame = await _gameRepo.UpdateDatailsAsync(existingGame, updateDto);
+            _logger.LogInformation("Game {GameId} updated by {Username}",
+                existingGame.Id, User.Identity?.Name ?? "unknown");
+
             return Ok(updatedGame.ToGameDto());
         }
 
@@ -76,7 +93,14 @@ namespace GameLibraryAPI.Controllers
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             var game = await _gameRepo.DeleteAsync(id);
-            if (game == null) return NotFound("Game not found.");
+            if (game == null)
+            {
+                _logger.LogWarning("Delete failed: game {GameId} not found", id);
+                return NotFound("Game not found.");
+            }
+
+            _logger.LogInformation("Game {GameId} deleted by {Username}",
+                game.Id, User.Identity?.Name ?? "unknown");
 
             return NoContent();
         }
