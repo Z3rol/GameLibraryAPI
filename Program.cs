@@ -79,6 +79,8 @@ builder.Services.AddCors(options =>
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", Serilog.Events.LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.AspNetCore", Serilog.Events.LogEventLevel.Warning)
     .WriteTo.Console()
     .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
