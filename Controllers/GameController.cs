@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using GameLibraryAPI.DTOs.Game;
 using Microsoft.AspNetCore.Authorization;
 using GameLibraryAPI.Helpers;
+using GameLibraryAPI.Extensions;
 
 namespace GameLibraryAPI.Controllers
 {
@@ -57,7 +58,7 @@ namespace GameLibraryAPI.Controllers
 
             await _gameRepo.CreateAsync(gameModel);
             _logger.LogInformation("Game '{GameName}' (Id: {GameId}) created by {Username}",
-                gameModel.Name, gameModel.Id, User.Identity?.Name ?? "unknown");
+                gameModel.Name, gameModel.Id, User.GetUserName() ?? "unknown");
 
             return CreatedAtAction(nameof (GetById), new {id = gameModel.Id}, gameModel.ToGameDto());
         }
@@ -84,7 +85,7 @@ namespace GameLibraryAPI.Controllers
 
             var updatedGame = await _gameRepo.UpdateDatailsAsync(existingGame, updateDto);
             _logger.LogInformation("Game {GameId} updated by {Username}",
-                existingGame.Id, User.Identity?.Name ?? "unknown");
+                existingGame.Id, User.GetUserName() ?? "unknown");
 
             return Ok(updatedGame.ToGameDto());
         }
@@ -100,7 +101,7 @@ namespace GameLibraryAPI.Controllers
             }
 
             _logger.LogInformation("Game {GameId} deleted by {Username}",
-                game.Id, User.Identity?.Name ?? "unknown");
+                game.Id, User.GetUserName() ?? "unknown");
 
             return NoContent();
         }
