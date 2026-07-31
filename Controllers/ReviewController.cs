@@ -22,11 +22,15 @@ namespace GameLibraryAPI.Controllers
         private readonly IReviewRepository _reviewRepo;
         private readonly IGameRepository _gameRepo;
         private readonly UserManager<AppUser> _userManager;
-        public ReviewController(IReviewRepository reviewRepo, IGameRepository gameRepo, UserManager<AppUser> userManager)
+        private readonly ILogger<ReviewController> _logger;
+        public ReviewController(
+            IReviewRepository reviewRepo, IGameRepository gameRepo,
+            UserManager<AppUser> userManager, ILogger<ReviewController> logger)
         {
             _reviewRepo = reviewRepo;
             _gameRepo = gameRepo;
             _userManager = userManager;
+            _logger = logger;
         }
 
         [HttpGet("game/{gameId:int}")]
@@ -34,7 +38,11 @@ namespace GameLibraryAPI.Controllers
         public async Task<IActionResult> GetReviewsByGameId([FromRoute] int gameId, [FromQuery] ReviewQueryObject query)
         {
             var gameExists = await _gameRepo.GameExistsAsync(gameId);
-            if (!gameExists) return NotFound("Game does not exist");
+            if (!gameExists)
+            {
+                _logger.LogWarning("Get reviews failed: game {GameId} not found", gameId);
+                return NotFound("Game does not exist");
+            }
 
             var reviewsDto = await _reviewRepo.GetReviewsByGameIdAsync(gameId, query);
 
@@ -46,7 +54,11 @@ namespace GameLibraryAPI.Controllers
         public async Task<IActionResult> GetReviewsByUsername([FromRoute] string username, [FromQuery] ReviewQueryObject query)
         {
             var user = await _userManager.FindByNameAsync(username);
-            if (user == null) return NotFound($"User '{username}' does not exist");
+            if (user == null)
+            {
+                _logger.LogWarning("Get reviews failed: user {Username} not found", username);
+                return NotFound($"User '{username}' does not exist");
+            }
 
             var reviewsDto = await _reviewRepo.GetReviewsByUserIdAsync(user.Id, query);
 
@@ -57,21 +69,40 @@ namespace GameLibraryAPI.Controllers
         public async Task<IActionResult> CreateReview([FromBody] CreateReviewRequestDto createDto)
         {
             var username = User.GetUserName();
-            if (string.IsNullOrWhiteSpace(username)) return Unauthorized("Could not extract username from token claims");
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                _logger.LogWarning("Could not extract username from token claims for request to {Path}", Request.Path);
+                return Unauthorized("Could not extract username from token claims");
+            }
 
             var appUser = await _userManager.FindByNameAsync(username);
-            if (appUser == null) return Unauthorized("User context not found");
+            if (appUser == null)
+            {
+                _logger.LogWarning("Token valid but no matching user found for username '{Username}'", username);
+                return Unauthorized("User context not found");
+            }
 
             var gameExists = await _gameRepo.GameExistsAsync(createDto.GameId ?? 0);
-            if (!gameExists) return NotFound("Game does not exist");
+            if (!gameExists)
+            {
+                _logger.LogWarning("Review creation failed: game {GameId} not found", createDto.GameId);
+                return NotFound("Game does not exist");
+            }
 
             var reviewExists = await _reviewRepo.UserHasReviewedGameAsync(appUser.Id, createDto.GameId ?? 0);
-            if (reviewExists) return BadRequest("User already has a review of this game");
+            if (reviewExists)
+            {
+                _logger.LogWarning("Review creation failed: user '{Username}' already has a review for game {GameId}",
+                    username, createDto.GameId);
+                return BadRequest("User already has a review of this game");
+            }
 
             var reviewModel = createDto.ToReviewFromCreate(appUser.Id);
 
             await _reviewRepo.CreateReviewAsync(reviewModel);
-            
+            _logger.LogInformation("Review created for game {GameId} by '{Username}'",
+                createDto.GameId, username);
+
             return CreatedAtAction(nameof(GetReviewsByGameId), new { gameId = reviewModel.GameId }, reviewModel.ToReviewDto());
         }
 
@@ -84,15 +115,31 @@ namespace GameLibraryAPI.Controllers
             if (!hasAnyValue) return BadRequest("Atleast one field must be provided");
 
             var username = User.GetUserName();
-            if (string.IsNullOrWhiteSpace(username)) return Unauthorized("Could not extract username from token claims");
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                _logger.LogWarning("Could not extract username from token claims for request to {Path}", Request.Path);
+                return Unauthorized("Could not extract username from token claims");
+            }
 
             var appUser = await _userManager.FindByNameAsync(username);
-            if (appUser == null) return Unauthorized("User context not found");
+            if (appUser == null)
+            {
+                _logger.LogWarning("Token valid but no matching user found for username '{Username}'", username);
+                return Unauthorized("User context not found");
+            }
 
             var review = await _reviewRepo.GetReviewByUserAndGameAsync(appUser.Id, gameId);
-            if (review == null) return NotFound("You have not reviewed this game");
+            if (review == null)
+            {
+                _logger.LogWarning("Review update failed: user '{Username}' doesnt have a review for game {GameId}",
+                    username, gameId);
+                return NotFound("You have not reviewed this game");
+            }
 
             var updatedReview = await _reviewRepo.UpdateReviewAsync(review, updateDto);
+            _logger.LogInformation("Review {ReviewId} updated by '{Username}' for game {GameId}",
+                review.Id, username, gameId);
+
             return Ok(updatedReview.ToReviewDto());
         }
 
@@ -100,15 +147,30 @@ namespace GameLibraryAPI.Controllers
         public async Task<IActionResult> DeleteReview([FromRoute] int gameId)
         {
             var username = User.GetUserName();
-            if (string.IsNullOrWhiteSpace(username)) return Unauthorized("Could not extract username from token claims");
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                _logger.LogWarning("Could not extract username from token claims for request to {Path}", Request.Path);
+                return Unauthorized("Could not extract username from token claims");
+            }
 
             var appUser = await _userManager.FindByNameAsync(username);
-            if (appUser == null) return Unauthorized("User context not found");
+            if (appUser == null)
+            {
+                _logger.LogWarning("Token valid but no matching user found for username '{Username}'", username);
+                return Unauthorized("User context not found");
+            }
 
             var review = await _reviewRepo.GetReviewByUserAndGameAsync(appUser.Id, gameId);
-            if (review == null) return NotFound("Review does not exist");
+            if (review == null)
+            {
+                _logger.LogWarning("Review deletion failed: game {GameId} not found", gameId);
+                return NotFound("Review does not exist");
+            }
 
             await _reviewRepo.DeleteReviewAsync(review.Id);
+            _logger.LogInformation("Review {ReviewId} deleted by '{Username}'",
+                review.Id, username);
+
             return NoContent();
         }
     }
