@@ -8,9 +8,14 @@ namespace GameLibraryAPI.DTOs.Game
 {
     public class CreateGameRequestDto
     {
+        private string _name = "";
         [Required]
         [StringLength(150, MinimumLength = 1, ErrorMessage = "Game name must be between 1 and 150 characters.")]
-        public string Name { get; set; } = "";
+        public string Name
+        {
+            get => _name;
+            set => _name = value?.Trim() ?? "";
+        }
         [Required]
         [StringLength(50, MinimumLength = 1, ErrorMessage = "Game genre must be between 1 and 50 characters.")]
         public string Genre { get; set; } = "";
