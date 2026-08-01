@@ -121,7 +121,7 @@ namespace GameLibraryAPI.Controllers
             _logger.LogInformation("Game {GameId} removed from '{Username}' account",
                 gameId, username);
 
-            return NoContent();
+            return Ok("Game successfully removed from your library");
         }
     }
 }
