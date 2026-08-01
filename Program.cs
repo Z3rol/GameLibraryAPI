@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IGameRepository, GameRepository>();
 builder.Services.AddScoped<ILibraryRepository, LibraryRepository>();
@@ -65,6 +69,24 @@ builder.Services.AddAuthentication(options =>
         ),
         RoleClaimType = "role"
     };
+});
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter your JWT token (just the token, no need to type 'Bearer' first)"
+    });
+
+    options.AddSecurityRequirement(document => new()
+    {
+        [new("Bearer", document)] = []
+    });
 });
 
 builder.Services.AddCors(options =>
@@ -131,6 +153,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.UseCors("AllowAll");
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
