@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using GameLibraryAPI.Extensions;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace GameLibraryAPI.Controllers
 {
@@ -33,6 +34,7 @@ namespace GameLibraryAPI.Controllers
         }
 
         [HttpPost("register")]
+        [EnableRateLimiting("AuthPolicy")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
             var appUser = new AppUser
@@ -64,6 +66,7 @@ namespace GameLibraryAPI.Controllers
         }
 
         [HttpPost("login")]
+        [EnableRateLimiting("AuthPolicy")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             var user = await _userManager.FindByNameAsync(loginDto.UserNameOrEmail)
