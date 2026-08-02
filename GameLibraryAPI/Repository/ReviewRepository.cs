@@ -79,7 +79,8 @@ namespace GameLibraryAPI.Repository
                     Rating = r.Rating,
                     CreatedOn = r.CreatedOn,
                     CreatedBy = r.AppUser.UserName ?? "",
-                    GameId = r.GameId
+                    GameId = r.GameId,
+                    GameName = r.Game.Name
                 })
                 .Skip(skipPages)
                 .Take(query.PageSize)
