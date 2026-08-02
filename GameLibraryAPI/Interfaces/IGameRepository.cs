@@ -15,7 +15,7 @@ namespace GameLibraryAPI.Interfaces
         public Task<GameDto?> GetByIdAsync(int id);
         public Task<Game?> GetGameEntityByIdAsync(int id);
         public Task<Game> CreateAsync(Game gameModel);
-        public Task<Game> UpdateDatailsAsync(Game game, UpdateGameDetailsDto updateDto);
+        public Task<GameDto> UpdateDatailsAsync(Game game, UpdateGameDetailsDto updateDto);
         public Task<Game?> DeleteAsync(int id);
         public Task<bool> GameExistsAsync(string name);
         public Task<bool> GameExistsAsync(int id);

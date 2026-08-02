@@ -88,7 +88,9 @@ namespace GameLibraryAPI.Repository
 
         public async Task<Game?> GetGameEntityByIdAsync(int id)
         {
-            return await _context.Games.FindAsync(id);
+            return await _context.Games
+                .Include(g => g.Reviews)
+                .FirstOrDefaultAsync(g => g.Id == id);
         }
 
         public async Task<Game> CreateAsync(Game gameModel)
@@ -98,7 +100,7 @@ namespace GameLibraryAPI.Repository
             return gameModel;
         }
 
-        public async Task<Game> UpdateDatailsAsync(Game game, UpdateGameDetailsDto updateDto)
+        public async Task<GameDto> UpdateDatailsAsync(Game game, UpdateGameDetailsDto updateDto)
         {
             game.Name = updateDto.Name;
             game.Genre = updateDto.Genre;
@@ -106,7 +108,15 @@ namespace GameLibraryAPI.Repository
             game.ReleaseDate = updateDto.ReleaseDate;
 
             await _context.SaveChangesAsync();
-            return game;
+
+            var averageRating = game.Reviews.Any()
+                ? Math.Round(game.Reviews.Average(r => r.Rating), 1, MidpointRounding.AwayFromZero)
+                : 0;
+
+            var gameDto = game.ToGameDto();
+            gameDto.AverageRating = averageRating;
+
+            return gameDto;
         }
 
         public async Task<Game?> DeleteAsync(int id)

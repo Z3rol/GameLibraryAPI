@@ -83,11 +83,11 @@ namespace GameLibraryAPI.Controllers
                 }
             }
 
-            var updatedGame = await _gameRepo.UpdateDatailsAsync(existingGame, updateDto);
+            var updatedGameDto = await _gameRepo.UpdateDatailsAsync(existingGame, updateDto);
             _logger.LogInformation("Game {GameId} updated by {Username}",
                 existingGame.Id, User.GetUserName() ?? "unknown");
 
-            return Ok(updatedGame.ToGameDto());
+            return Ok(updatedGameDto);
         }
 
         [HttpDelete("{id}")]
