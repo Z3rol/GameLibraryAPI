@@ -1,15 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GameLibraryAPI.DTOs.Account;
 using GameLibraryAPI.Models;
 using GameLibraryAPI.Interfaces;
-using GameLibraryAPI.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using GameLibraryAPI.Extensions;
 using Microsoft.AspNetCore.RateLimiting;
 
 namespace GameLibraryAPI.Controllers
