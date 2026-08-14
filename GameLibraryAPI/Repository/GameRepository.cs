@@ -33,7 +33,7 @@ namespace GameLibraryAPI.Repository
 
             if (!string.IsNullOrWhiteSpace(query.DeveloperName))
             {
-                games = games.Where(g => g.DeveloperName.ToLower() == query.DeveloperName.ToLower());
+                games = games.Where(g => g.DeveloperName.ToLower().Contains(query.DeveloperName.ToLower()));
             }
 
             // Sorting
