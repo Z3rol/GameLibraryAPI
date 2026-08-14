@@ -36,6 +36,16 @@ namespace GameLibraryAPI.Repository
                 games = games.Where(g => g.DeveloperName.ToLower().Contains(query.DeveloperName.ToLower()));
             }
 
+            if (query.ReleasedAfter != null)
+            {
+                games = games.Where(g => g.ReleaseDate >= query.ReleasedAfter);
+            }
+
+            if (query.ReleasedBefore != null)
+            {
+                games = games.Where(g => g.ReleaseDate <= query.ReleasedBefore);
+            }
+
             // Sorting
             if (!string.IsNullOrWhiteSpace(query.SortBy))
             {
