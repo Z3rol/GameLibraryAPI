@@ -43,7 +43,7 @@ namespace GameLibraryAPI.Controllers
             {
                 _logger.LogWarning("Registration failed for {UserName}: {Errors}",
                     registerDto.UserName, string.Join(", ", createdUser.Errors.Select(e => e.Description)));
-                return StatusCode(500, createdUser.Errors);
+                return BadRequest(createdUser.Errors);
             }
 
             var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
