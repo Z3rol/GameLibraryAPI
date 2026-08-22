@@ -8,7 +8,7 @@ namespace GameLibraryAPI.DTOs.Review
         [Length(1, 50, ErrorMessage = "Title must be between 1 and 50 characters")]
         public string Title { get; set; } = "";
         [Required]
-        [Length(1, 250, ErrorMessage = "Content must be between 1 and 50 characters")]
+        [Length(1, 250, ErrorMessage = "Content must be between 1 and 250 characters")]
         public string Content { get; set; } = "";
         private double _rating;
         [Required]
