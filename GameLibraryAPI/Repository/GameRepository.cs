@@ -20,30 +20,48 @@ namespace GameLibraryAPI.Repository
         {
             var games = _context.Games.AsQueryable();
 
+            var projected = games.Select(g => new
+            {
+                Game = g,
+                AverageRating = g.Reviews.Any()
+                    ? Math.Round(g.Reviews.Average(r => r.Rating), 1, MidpointRounding.AwayFromZero)
+                    : 0
+            });
+
             // Filtering
             if (!string.IsNullOrWhiteSpace(query.Name))
             {
-                games = games.Where(g => g.Name.ToLower().Contains(query.Name.ToLower()));
+                projected = projected.Where(x => x.Game.Name.ToLower().Contains(query.Name.ToLower()));
             }
 
             if (!string.IsNullOrWhiteSpace(query.Genre))
             {
-                games = games.Where(g => g.Genre.ToLower() == query.Genre.ToLower());
+                projected = projected.Where(x => x.Game.Genre.ToLower() == query.Genre.ToLower());
             }
 
             if (!string.IsNullOrWhiteSpace(query.DeveloperName))
             {
-                games = games.Where(g => g.DeveloperName.ToLower().Contains(query.DeveloperName.ToLower()));
+                projected = projected.Where(x => x.Game.DeveloperName.ToLower().Contains(query.DeveloperName.ToLower()));
             }
 
             if (query.ReleasedAfter != null)
             {
-                games = games.Where(g => g.ReleaseDate >= query.ReleasedAfter);
+                projected = projected.Where(x => x.Game.ReleaseDate >= query.ReleasedAfter);
             }
 
             if (query.ReleasedBefore != null)
             {
-                games = games.Where(g => g.ReleaseDate <= query.ReleasedBefore);
+                projected = projected.Where(x => x.Game.ReleaseDate <= query.ReleasedBefore);
+            }
+
+            if (query.MinAverageRating != null)
+            {
+                projected = projected.Where(x => x.AverageRating >= query.MinAverageRating);
+            }
+
+            if (query.MaxAverageRating != null)
+            {
+                projected = projected.Where(x => x.AverageRating <= query.MaxAverageRating);
             }
 
             // Sorting
@@ -51,23 +69,25 @@ namespace GameLibraryAPI.Repository
             {
                 if (query.SortBy.Equals("ReleaseDate", StringComparison.OrdinalIgnoreCase))
                 {
-                    games = query.IsDescending ? games.OrderByDescending(g => g.ReleaseDate) : games.OrderBy(g => g.ReleaseDate);
+                    projected = query.IsDescending ? projected.OrderByDescending(x => x.Game.ReleaseDate) : projected.OrderBy(x => x.Game.ReleaseDate);
+                }
+                else if (query.SortBy.Equals("Rating", StringComparison.OrdinalIgnoreCase))
+                {
+                    projected = query.IsDescending ? projected.OrderByDescending(x => x.AverageRating) : projected.OrderBy(x => x.AverageRating);
                 }
             }
 
             var skipPages = (query.PageNumber - 1) * query.PageSize;
 
-            return await games
-                .Select(g => new GameDto
+            return await projected
+                .Select(x => new GameDto
                 {
-                    Id = g.Id,
-                    Name = g.Name,
-                    Genre = g.Genre,
-                    DeveloperName = g.DeveloperName,
-                    ReleaseDate = g.ReleaseDate,
-                    AverageRating = g.Reviews.Any()
-                        ? Math.Round(g.Reviews.Average(r => r.Rating), 1, MidpointRounding.AwayFromZero)
-                        : 0
+                    Id = x.Game.Id,
+                    Name = x.Game.Name,
+                    Genre = x.Game.Genre,
+                    DeveloperName = x.Game.DeveloperName,
+                    ReleaseDate = x.Game.ReleaseDate,
+                    AverageRating = x.AverageRating
                 })
                 .Skip(skipPages)
                 .Take(query.PageSize)
