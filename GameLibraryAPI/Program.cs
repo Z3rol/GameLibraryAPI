@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Microsoft.OpenApi;
 using Microsoft.AspNetCore.RateLimiting;
+using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,7 +69,8 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"]!)
         ),
-        RoleClaimType = "role"
+        RoleClaimType = "role",
+        NameClaimType = JwtRegisteredClaimNames.GivenName
     };
 });
 

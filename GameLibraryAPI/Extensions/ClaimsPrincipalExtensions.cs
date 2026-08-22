@@ -7,7 +7,7 @@ namespace GameLibraryAPI.Extensions
     {
         public static string GetUserName(this ClaimsPrincipal user)
         {
-            var username = user.Identity?.Name ?? user.FindFirstValue(JwtRegisteredClaimNames.GivenName);
+            var username = user.Identity?.Name;
 
             if (string.IsNullOrWhiteSpace(username))
                 throw new UnauthorizedAccessException("Username claim is missing from the token");
