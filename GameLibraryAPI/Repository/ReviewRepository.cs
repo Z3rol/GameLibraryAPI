@@ -1,3 +1,4 @@
+using System.Data.Common;
 using GameLibraryAPI.Data;
 using GameLibraryAPI.DTOs.Review;
 using GameLibraryAPI.Helpers;
@@ -142,9 +143,16 @@ namespace GameLibraryAPI.Repository
 
         public async Task<Review> CreateReviewAsync(Review review)
         {
-            await _context.Reviews.AddAsync(review);
-            await _context.SaveChangesAsync();
-            return review;
+            try
+            {
+                await _context.Reviews.AddAsync(review);
+                await _context.SaveChangesAsync();
+                return review;
+            }
+            catch (DbUpdateException)
+            {
+                throw new InvalidOperationException("You already have a review for this game");
+            }
         }
 
         public async Task<Review> UpdateReviewAsync(Review review, UpdateReviewRequestDto updateDto)

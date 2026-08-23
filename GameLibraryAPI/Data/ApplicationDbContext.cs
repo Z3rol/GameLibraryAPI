@@ -38,7 +38,6 @@ namespace GameLibraryAPI.Data
 
             builder.Entity<IdentityRole>().HasData(roles);
 
-
             builder.Entity<UserGame>()
                 .HasKey(ug => new { ug.AppUserId, ug.GameId });
 
@@ -51,6 +50,10 @@ namespace GameLibraryAPI.Data
                 .HasOne(ug => ug.Game)
                 .WithMany(ug => ug.UserGames)
                 .HasForeignKey(ug => ug.GameId);
+
+            builder.Entity<Review>()
+                .HasIndex(r => new { r.AppUserId, r.GameId })
+                .IsUnique();
         }
     }
 }

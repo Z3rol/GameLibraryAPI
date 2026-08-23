@@ -95,7 +95,15 @@ namespace GameLibraryAPI.Controllers
 
             var reviewModel = createDto.ToReviewFromCreate(appUser.Id);
 
-            await _reviewRepo.CreateReviewAsync(reviewModel);
+            try
+            {
+                await _reviewRepo.CreateReviewAsync(reviewModel);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning("Review creation blocked by database constraint: {Message}", ex.Message);
+                return BadRequest(ex.Message);
+            }
             _logger.LogInformation("Review created for game {GameId} by '{Username}'",
                 createDto.GameId, username);
 

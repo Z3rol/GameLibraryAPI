@@ -136,9 +136,10 @@ namespace GameLibraryAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppUserId");
-
                     b.HasIndex("GameId");
+
+                    b.HasIndex("AppUserId", "GameId")
+                        .IsUnique();
 
                     b.ToTable("Reviews");
                 });
