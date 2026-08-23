@@ -14,12 +14,5 @@ namespace GameLibraryAPI.Extensions
 
             return username;
         }
-
-        public static string GetUserId(this ClaimsPrincipal user)
-        {
-            return user.FindFirstValue(ClaimTypes.NameIdentifier)
-                ?? user.FindFirstValue(JwtRegisteredClaimNames.Sub)
-                ?? throw new UnauthorizedAccessException("User ID claim is missing from the token");
-        }
     }
 }
