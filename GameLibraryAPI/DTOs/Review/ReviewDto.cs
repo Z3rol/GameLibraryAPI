@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace GameLibraryAPI.DTOs.Review
 {
     public class ReviewDto
@@ -9,6 +11,7 @@ namespace GameLibraryAPI.DTOs.Review
         public DateTime CreatedOn { get; set; }
         public string CreatedBy { get; set; } = "";
         public int GameId { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string GameName { get; set; } = "";
     }
 }
