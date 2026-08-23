@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GameLibraryAPI.Controllers
 {
-    [Route("api/users/{username}/library")]
+    [Route("api/users/{userName}/library")]
     [ApiController]
     [Authorize]
     public class LibraryController : ControllerBase
@@ -34,7 +34,7 @@ namespace GameLibraryAPI.Controllers
             var user = await _userManager.FindByNameAsync(userName);
             if (user == null)
             {
-                _logger.LogWarning("Get library failed: user '{Username}' not found", userName);
+                _logger.LogWarning("Get library failed: user '{UserName}' not found", userName);
                 return NotFound($"User '{userName}' does not exist.");
             }
 
@@ -46,17 +46,17 @@ namespace GameLibraryAPI.Controllers
         [HttpPost("~/api/library/{gameId}")]
         public async Task<IActionResult> AddGameToLibrary([FromRoute] int gameId)
         {
-            var username = User.GetUserName();
-            if (string.IsNullOrWhiteSpace(username))
+            var userName = User.GetUserName();
+            if (string.IsNullOrWhiteSpace(userName))
             {
                 _logger.LogWarning("Could not extract username from token claims for request to {Path}", Request.Path);
                 return Unauthorized("Could not extract username from token claims");
             }
 
-            var appUser = await _userManager.FindByNameAsync(username);
+            var appUser = await _userManager.FindByNameAsync(userName);
             if (appUser == null)
             {
-                _logger.LogWarning("Token valid but no matching user found for username '{Username}'", username);
+                _logger.LogWarning("Token valid but no matching user found for username '{UserName}'", userName);
                 return Unauthorized("User context not found");
             }
 
@@ -70,14 +70,14 @@ namespace GameLibraryAPI.Controllers
             var userOwnsGame = await _libraryRepo.UserOwnsGameAsync(appUser.Id, gameId);
             if (userOwnsGame)
             {
-                _logger.LogWarning("Adding game to library failed: game {GameId} already on user '{Username}' account",
-                    gameId, username);
+                _logger.LogWarning("Adding game to library failed: game {GameId} already on user '{UserName}' account",
+                    gameId, userName);
                 return BadRequest("You already own this game.");
             }
 
             await _libraryRepo.AddGameToLibraryAsync(appUser.Id, gameId);
-            _logger.LogInformation("Game {GameId} added to '{Username}' library",
-                gameId, username);
+            _logger.LogInformation("Game {GameId} added to '{UserName}' library",
+                gameId, userName);
 
             return Ok("Game successfully added to your library.");
         }
@@ -85,31 +85,31 @@ namespace GameLibraryAPI.Controllers
         [HttpDelete("~/api/library/{gameId}")]
         public async Task<IActionResult> RemoveGameFromLibrary([FromRoute] int gameId)
         {
-            var username = User.GetUserName();
-            if (string.IsNullOrWhiteSpace(username))
+            var userName = User.GetUserName();
+            if (string.IsNullOrWhiteSpace(userName))
             {
                 _logger.LogWarning("Could not extract username from token claims for request to {Path}", Request.Path);
                 return Unauthorized("Could not extract username from token claims");
             }
 
-            var appUser = await _userManager.FindByNameAsync(username);
+            var appUser = await _userManager.FindByNameAsync(userName);
             if (appUser == null)
             {
-                _logger.LogWarning("Token valid but no matching user found for username '{Username}'", username);
+                _logger.LogWarning("Token valid but no matching user found for username '{UserName}'", userName);
                 return Unauthorized("User context not found");
             }
 
             var userOwnsGame = await _libraryRepo.UserOwnsGameAsync(appUser.Id, gameId);
             if (!userOwnsGame)
             {
-                _logger.LogWarning("Removing game from library failed: game {GameId} not found on '{Username} account'",
-                    gameId, username);
+                _logger.LogWarning("Removing game from library failed: game {GameId} not found on '{UserName} account'",
+                    gameId, userName);
                 return BadRequest("This game is not in your library");
             }
 
             await _libraryRepo.RemoveGameFromLibraryAsync(appUser.Id, gameId);
-            _logger.LogInformation("Game {GameId} removed from '{Username}' account",
-                gameId, username);
+            _logger.LogInformation("Game {GameId} removed from '{UserName}' account",
+                gameId, userName);
 
             return Ok("Game successfully removed from your library");
         }

@@ -41,7 +41,7 @@ namespace GameLibraryAPI.Controllers
 
             if (!createdUser.Succeeded)
             {
-                _logger.LogWarning("Registration failed for {UserName}: {Errors}",
+                _logger.LogWarning("Registration for {UserName} failed: {Errors}",
                     registerDto.UserName, string.Join(", ", createdUser.Errors.Select(e => e.Description)));
                 return BadRequest(createdUser.Errors);
             }
@@ -50,7 +50,7 @@ namespace GameLibraryAPI.Controllers
 
             if (!roleResult.Succeeded)
             {
-                _logger.LogWarning("Role assignment failed for {UserName}: {Errors}",
+                _logger.LogWarning("Role assignment for {UserName} failed: {Errors}",
                     registerDto.UserName, string.Join(", ", roleResult.Errors.Select(e => e.Description)));
                 return StatusCode(500, roleResult.Errors);
             }
@@ -68,7 +68,7 @@ namespace GameLibraryAPI.Controllers
 
             if (user == null)
             {
-                _logger.LogWarning("Login failed: no user found for {UserNameOrEmail}", loginDto.UserNameOrEmail);
+                _logger.LogWarning("Login for {UserNameOrEmail} failed: user does not exist", loginDto.UserNameOrEmail);
                 return Unauthorized("Invalid username or password");
             }
 
@@ -76,7 +76,7 @@ namespace GameLibraryAPI.Controllers
 
             if (!result.Succeeded)
             {
-                _logger.LogWarning("Login failed: incorrect password for {UserNameOrEmail}", loginDto.UserNameOrEmail);
+                _logger.LogWarning("Login for {UserNameOrEmail} failed: incorrect password", loginDto.UserNameOrEmail);
                 return Unauthorized("Invalid username or password");
             }
 
@@ -98,13 +98,26 @@ namespace GameLibraryAPI.Controllers
         public async Task<IActionResult> PromoteToAdmin([FromRoute] string username)
         {
             var user = await _userManager.FindByNameAsync(username);
-            if (user == null) return NotFound("User does not exist");
+            if (user == null)
+            {
+                _logger.LogWarning("Admin promotion for '{Username}' failed: user does not exist", username);
+                return NotFound("User does not exist");
+            }
 
             var alreadyAdmin = await _userManager.IsInRoleAsync(user, "Admin");
-            if (alreadyAdmin) return BadRequest("User is already an admin");
+            if (alreadyAdmin)
+            {
+                _logger.LogWarning("Admin promotion for '{Username}' failed: user already admin", username);
+                return BadRequest("User is already an admin");
+            }
 
             var result = await _userManager.AddToRoleAsync(user, "Admin");
-            if (!result.Succeeded) return BadRequest(result.Errors);
+            if (!result.Succeeded)
+            {
+                _logger.LogWarning("Admin promotion for '{Username}' failed: {Errors}",
+                    username, string.Join(", ", result.Errors.Select(e => e.Description)));
+                return BadRequest(result.Errors);
+            }
 
             _logger.LogInformation("User {UserName} promoted to admin by {PromotedBy}",
                 user.UserName, User.Identity?.Name ?? "unknown");

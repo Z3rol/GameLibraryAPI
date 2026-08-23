@@ -17,12 +17,12 @@ namespace GameLibraryAPI.Middleware
             Exception exception,
             CancellationToken cancellationToken)
         {
-            _logger.LogError(exception, "Unhandled exception occured");
+            _logger.LogError(exception, "Unhandled exception occurred");
 
             var problemDetails = new ProblemDetails
             {
                 Status = StatusCodes.Status500InternalServerError,
-                Title = "An unexpected error occured",
+                Title = "An unexpected error occurred",
                 Detail = "Something went wrong. Please try again"
             };
 
