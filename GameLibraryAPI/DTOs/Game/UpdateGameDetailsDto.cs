@@ -12,12 +12,22 @@ namespace GameLibraryAPI.DTOs.Game
             get => _name;
             set => _name = value?.Trim() ?? "";
         }
+        private string _genre = "";
         [Required]
         [StringLength(50, MinimumLength = 1, ErrorMessage = "Game genre must be between 1 and 50 characters")]
-        public string Genre { get; set; } = "";
+        public string Genre
+        {
+            get => _genre;
+            set => _genre = value?.Trim() ?? "";
+        }
+        private string _developerName = "";
         [Required]
         [StringLength(100, MinimumLength = 1, ErrorMessage = "Game developer name must be between 1 and 100 characters")]
-        public string DeveloperName { get; set; } = "";
+        public string DeveloperName
+        {
+            get => _developerName;
+            set => _developerName = value?.Trim() ?? "";
+        }
         [Required]
         public DateOnly ReleaseDate { get; set; }
     }
