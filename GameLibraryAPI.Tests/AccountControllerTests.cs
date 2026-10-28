@@ -74,8 +74,7 @@ namespace GameLibraryAPI.Tests
 
             var result = await controller.Register(registerDto);
 
-            var objectResult = Assert.IsType<ObjectResult>(result);
-            Assert.Equal(500, objectResult.StatusCode);
+            Assert.IsType<BadRequestObjectResult>(result);
         }
 
         //             //
@@ -156,10 +155,11 @@ namespace GameLibraryAPI.Tests
         public async Task PromoteToAdmin_ShouldReturnNotFound_WhenUserDoesNotExist()
         {
             var mockUserManager = TestHelpers.MockUserManager();
+            var mockLogger = new Mock<ILogger<AccountController>>();
             
             mockUserManager.Setup(m => m.FindByNameAsync("TestUser")).ReturnsAsync((AppUser)null!);
 
-            var controller = new AccountController(mockUserManager.Object, null!, null!, null!);
+            var controller = new AccountController(mockUserManager.Object, null!, null!, mockLogger.Object);
 
             var result = await controller.PromoteToAdmin("TestUser");
 
@@ -170,13 +170,14 @@ namespace GameLibraryAPI.Tests
         public async Task PromoteToAdmin_ShouldReturnBadRequest_WhenUserAlreadyAdmin()
         {
             var mockUserManager = TestHelpers.MockUserManager();
+            var mockLogger = new Mock<ILogger<AccountController>>();
 
             var fakeUser = new AppUser { Id = "user-1", UserName = "TestUser" };
             
             mockUserManager.Setup(m => m.FindByNameAsync("TestUser")).ReturnsAsync(fakeUser);
             mockUserManager.Setup(m => m.IsInRoleAsync(fakeUser, "Admin")).ReturnsAsync(true);
 
-            var controller = new AccountController(mockUserManager.Object, null!, null!, null!);
+            var controller = new AccountController(mockUserManager.Object, null!, null!, mockLogger.Object);
 
             var result = await controller.PromoteToAdmin("TestUser");
 
@@ -187,6 +188,7 @@ namespace GameLibraryAPI.Tests
         public async Task PromoteToAdmin_ShouldReturnBadRequestWithErrors_WhenAddToRoleFails()
         {
             var mockUserManager = TestHelpers.MockUserManager();
+            var mockLogger = new Mock<ILogger<AccountController>>();
 
             var fakeUser = new AppUser { Id = "user-1", UserName = "TestUser" };
             var fakeError = new IdentityError 
@@ -199,7 +201,7 @@ namespace GameLibraryAPI.Tests
             mockUserManager.Setup(m => m.IsInRoleAsync(fakeUser, "Admin")).ReturnsAsync(false);
             mockUserManager.Setup(m => m.AddToRoleAsync(fakeUser, "Admin")).ReturnsAsync(IdentityResult.Failed(fakeError));
 
-            var controller = new AccountController(mockUserManager.Object, null!, null!, null!);
+            var controller = new AccountController(mockUserManager.Object, null!, null!, mockLogger.Object);
 
             var result = await controller.PromoteToAdmin("TestUser");
 
