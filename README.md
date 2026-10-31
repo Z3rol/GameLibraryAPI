@@ -20,7 +20,7 @@ A REST API for tracking a personal video game library — browse a game catalog,
 ## Tech stack
 
 - **ASP.NET Core** (C#) / **Entity Framework Core**
-- **SQLite** for storage
+- **PostgreSQL** for storage, run locally with Docker Compose
 - **ASP.NET Identity** + **JWT Bearer** authentication
 - **Serilog** for logging
 - **Swashbuckle** (Swagger/OpenAPI)
@@ -46,30 +46,38 @@ Standard layered structure: controllers depend on repository interfaces (not con
 
 ## Getting started
 
-**Prerequisites:** .NET SDK, `dotnet-ef` tool (`dotnet tool install --global dotnet-ef`)
+**Prerequisites:** .NET SDK, Docker (for the PostgreSQL database), `dotnet-ef` tool (`dotnet tool install --global dotnet-ef`)
 
-1. Clone the repo and restore dependencies:
+1. Clone the repo:
    ```bash
    git clone https://github.com/Z3rol/GameLibraryAPI.git
-   cd GameLibraryAPI/GameLibraryAPI
-   dotnet restore
+   cd GameLibraryAPI
    ```
 
-2. Set the required secrets (never committed — see `.gitignore`):
+2. Start the database. Copy `.env.example` to `.env`, set your own values, then start PostgreSQL with Docker Compose (data is kept in a Docker volume, so it survives restarts):
    ```bash
+   cp .env.example .env
+   docker compose up -d
+   ```
+
+3. Restore dependencies and set the required secrets (never committed — see `.gitignore`). The username, password and database in the connection string must match the values in your `.env`:
+   ```bash
+   cd GameLibraryAPI
+   dotnet restore
    dotnet user-secrets init
+   dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=<POSTGRES_DB>;Username=<POSTGRES_USER>;Password=<POSTGRES_PASSWORD>"
    dotnet user-secrets set "JWT:SigningKey" "<a long random string>"
    dotnet user-secrets set "Seed:AdminEmail" "admin@example.com"
    dotnet user-secrets set "Seed:AdminPassword" "<a strong password>"
    ```
 
-3. Apply migrations and run:
+4. Apply migrations and run:
    ```bash
    dotnet ef database update
    dotnet run
    ```
 
-4. Open `/swagger` to explore and test the API. Log in via `/api/account/login` with your seeded admin credentials, then use the "Authorize" button in Swagger to test authenticated endpoints.
+5. Open `/swagger` to explore and test the API. Log in via `/api/account/login` with your seeded admin credentials, then use the "Authorize" button in Swagger to test authenticated endpoints.
 
 ## API overview
 
